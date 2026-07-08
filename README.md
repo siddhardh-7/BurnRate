@@ -7,7 +7,7 @@
 <p align="center">
   <a href="https://www.wemakedevs.org/hackathons/signoz"><img src="https://img.shields.io/badge/Agents_of_SigNoz-Hackathon_2026-7c4dff" alt="Agents of SigNoz 2026"></a>
   <a href="https://opentelemetry.io"><img src="https://img.shields.io/badge/OpenTelemetry-native-f5a800" alt="OpenTelemetry"></a>
-  <img src="https://img.shields.io/badge/pip_install-burnrate--otel-blue" alt="PyPI coming soon">
+  <img src="https://img.shields.io/badge/PyPI-coming_soon-lightgrey" alt="PyPI coming soon">
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0-green" alt="Apache 2.0"></a>
 </p>
 
@@ -117,7 +117,9 @@ curl -X POST "http://localhost:8001/research/batch?count=5"
 ## SDK Installation
 
 ```bash
-pip install burnrate-otel   # publishing to PyPI before submission
+git clone https://github.com/siddhardh-7/BurnRate.git
+cd BurnRate
+uv pip install -e packages/burnrate-otel
 ```
 
 ```python
