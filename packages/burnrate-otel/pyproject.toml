@@ -8,7 +8,7 @@ version = "0.1.0"
 description = "OpenTelemetry cost observability for AI agents — fills the gen_ai.usage.cost.* gap in the OTel GenAI semantic conventions."
 readme = "README.md"
 license = { text = "Apache-2.0" }
-requires-python = ">=3.11"
+requires-python = ">=3.9"
 keywords = ["opentelemetry", "llm", "ai-agents", "observability", "finops", "signoz"]
 classifiers = [
     "Development Status :: 3 - Alpha",

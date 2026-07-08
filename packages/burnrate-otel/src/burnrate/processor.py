@@ -29,9 +29,6 @@ from typing import Any
 
 from opentelemetry.context import Context
 from opentelemetry.sdk.trace import ReadableSpan, Span
-from opentelemetry.sdk.trace.export import SpanExporter
-from opentelemetry.trace import SpanKind
-from opentelemetry.trace.span import NonRecordingSpan
 
 from .metrics import CostMetrics
 from .pricing import PricingTable
@@ -83,12 +80,33 @@ class BurnrateSpanProcessor:
     # ── SpanProcessor interface ──────────────────────────────────────────────
 
     def on_start(self, span: Span, parent_context: Context | None = None) -> None:
-        pass  # nothing to do on start
+        pass
+
+    def _on_ending(self, span: Span) -> None:
+        """
+        Called by the OTel SDK with a still-mutable span just before it ends.
+        This is the preferred hook for enriching spans with derived attributes.
+        """
+        self._enrich(span, span.attributes or {})
 
     def on_end(self, span: ReadableSpan) -> None:
+        """
+        Fallback for OTel SDK versions that don't call _on_ending.
+        Span is read-only here, so we only emit metrics (no span enrichment).
+        """
         attrs = span.attributes or {}
+        input_tokens = int(attrs.get(GEN_AI_USAGE_INPUT_TOKENS, 0))
+        output_tokens = int(attrs.get(GEN_AI_USAGE_OUTPUT_TOKENS, 0))
+        if input_tokens == 0 and output_tokens == 0:
+            return
+        model = attrs.get(GEN_AI_RESPONSE_MODEL) or attrs.get(GEN_AI_REQUEST_MODEL) or ""
+        cost = self._pricing.cost(model=model, input_tokens=input_tokens, output_tokens=output_tokens)
+        metric_attrs: dict[str, Any] = {"gen_ai.request.model": model or "unknown"}
+        self._metrics.record(cost=cost, attrs=metric_attrs,
+                             input_tokens=input_tokens, output_tokens=output_tokens)
 
-        # Only process spans that have token usage — skip everything else
+    def _enrich(self, span: Span, attrs: Any) -> None:
+        """Core enrichment logic — called with a mutable span."""
         input_tokens = int(attrs.get(GEN_AI_USAGE_INPUT_TOKENS, 0))
         output_tokens = int(attrs.get(GEN_AI_USAGE_OUTPUT_TOKENS, 0))
         if input_tokens == 0 and output_tokens == 0:
@@ -98,7 +116,6 @@ class BurnrateSpanProcessor:
         cache_read = int(attrs.get(GEN_AI_USAGE_CACHE_READ_INPUT_TOKENS, 0))
         reasoning = int(attrs.get(GEN_AI_USAGE_REASONING_TOKENS, 0))
 
-        # Prefer the actual response model over the requested model
         model = (
             attrs.get(GEN_AI_RESPONSE_MODEL)
             or attrs.get(GEN_AI_REQUEST_MODEL)
@@ -121,19 +138,23 @@ class BurnrateSpanProcessor:
                 model,
             )
 
-        # Enrich the span (proposed gen_ai.usage.cost.* semconv attributes)
+        # Write cost attributes directly to span._attributes.
+        # We bypass span.set_attribute() because in OTel SDK ≥1.26 the span's
+        # _end_time is set BEFORE _on_ending fires, causing set_attribute() to
+        # log a warning and return early. BoundedAttributes itself is mutable
+        # (immutable=False at construction time).
         try:
-            span._attributes = dict(attrs)  # make mutable copy
-            span._attributes[GEN_AI_USAGE_COST_TOTAL] = round(cost["total"], 8)
-            span._attributes[GEN_AI_USAGE_COST_INPUT] = round(cost["input"], 8)
-            span._attributes[GEN_AI_USAGE_COST_OUTPUT] = round(cost["output"], 8)
-            span._attributes[GEN_AI_USAGE_COST_CACHE_CREATION] = round(cost["cache_creation"], 8)
-            span._attributes[GEN_AI_USAGE_COST_CACHE_READ] = round(cost["cache_read"], 8)
-            span._attributes[GEN_AI_USAGE_COST_REASONING] = round(cost["reasoning"], 8)
-            span._attributes[GEN_AI_USAGE_COST_CURRENCY] = "USD"
-            span._attributes[GEN_AI_USAGE_COST_PRICING_MODEL] = "per_token"
+            a = span._attributes
+            a[GEN_AI_USAGE_COST_TOTAL] = round(cost["total"], 8)
+            a[GEN_AI_USAGE_COST_INPUT] = round(cost["input"], 8)
+            a[GEN_AI_USAGE_COST_OUTPUT] = round(cost["output"], 8)
+            a[GEN_AI_USAGE_COST_CACHE_CREATION] = round(cost["cache_creation"], 8)
+            a[GEN_AI_USAGE_COST_CACHE_READ] = round(cost["cache_read"], 8)
+            a[GEN_AI_USAGE_COST_REASONING] = round(cost["reasoning"], 8)
+            a[GEN_AI_USAGE_COST_CURRENCY] = "USD"
+            a[GEN_AI_USAGE_COST_PRICING_MODEL] = "per_token"
         except Exception:
-            pass  # read-only span (e.g. already exported) — skip enrichment, still emit metrics
+            pass  # SDK internal API changed — metrics still flow
 
         # Build metric dimensions for cost attribution
         metric_attrs: dict[str, Any] = {}
@@ -141,7 +162,7 @@ class BurnrateSpanProcessor:
             (GEN_AI_SYSTEM, "gen_ai.system"),
             (GEN_AI_OPERATION_NAME, "gen_ai.operation.name"),
             (BURNRATE_AGENT_ID, "burnrate.agent.id"),
-            (GEN_AI_AGENT_ID, "burnrate.agent.id"),      # upstream attr fallback
+            (GEN_AI_AGENT_ID, "burnrate.agent.id"),
             (GEN_AI_AGENT_NAME, "burnrate.agent.name"),
             (BURNRATE_TASK_ID, "burnrate.task.id"),
             (BURNRATE_USER_ID, "burnrate.user.id"),
