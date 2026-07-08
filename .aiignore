@@ -1,0 +1,44 @@
+# ── Version Control ───────────────────────────────────────────────────────────
+.git/
+
+# ── Dependency & Virtual Environments ─────────────────────────────────────────
+.venv/
+venv/
+env/
+node_modules/
+
+# ── Caches and Temp Files ─────────────────────────────────────────────────────
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.DS_Store
+.DS_Store?
+
+# ── Build & Dist ──────────────────────────────────────────────────────────────
+dist/
+build/
+*.egg-info/
+
+# ── Credentials & Local Configs ───────────────────────────────────────────────
+.env
+.env.local
+.env.*.local
+*.secret
+*.pem
+*.key
+
+# ── Telemetry & Local DB ──────────────────────────────────────────────────────
+**/data/
+*.log
+
+# ── Media and Assets ──────────────────────────────────────────────────────────
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.svg
+*.mp4
+*.webm
+*.pdf

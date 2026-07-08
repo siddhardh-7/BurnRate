@@ -1,0 +1,40 @@
+version: "3.9"
+
+services:
+  demo-app:
+    build:
+      context: .                      # project root — gives Dockerfile access to packages/burnrate-otel
+      dockerfile: demo-app/Dockerfile
+    ports:
+      - "8001:8001"
+    env_file: .env
+    environment:
+      PORT: "8001"
+    restart: unless-stopped
+
+  cost-guard:
+    build:
+      context: ./cost-guard
+      dockerfile: Dockerfile
+    ports:
+      - "8082:8082"
+    env_file: .env
+    environment:
+      PORT: "8082"
+      DEMO_APP_URL: "http://demo-app:8001"
+    depends_on:
+      - demo-app
+    restart: unless-stopped
+
+  # Uncomment if using self-hosted SigNoz instead of SigNoz Cloud
+  # signoz:
+  #   image: signoz/signoz:latest
+  #   ports:
+  #     - "3301:3301"
+  #     - "4317:4317"
+  #     - "4318:4318"
+  #   volumes:
+  #     - signoz-data:/var/lib/clickhouse
+
+# volumes:
+#   signoz-data:

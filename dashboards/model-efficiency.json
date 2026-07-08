@@ -1,0 +1,96 @@
+{
+  "title": "Burnrate — Model Efficiency",
+  "description": "Cost efficiency signals: cache hit rates, cost per output token, model distribution. Find waste before it becomes an incident.",
+  "tags": ["burnrate", "llm", "finops", "efficiency"],
+  "layout": [
+    {
+      "id": "cache_hit_rate",
+      "title": "Cache Hit Rate by Agent (%)",
+      "description": "cache_read_tokens / (input_tokens + cache_read_tokens). Drop = cache_miss_storm.",
+      "panelType": "graph",
+      "query": {
+        "queryType": "builder",
+        "builderQueries": {
+          "cache_read": {
+            "dataSource": "metrics",
+            "aggregateOperator": "sum",
+            "aggregateAttribute": { "key": "burnrate.tokens.cache_read", "type": "Sum" },
+            "groupBy": [{ "key": "burnrate.agent.id" }]
+          },
+          "input": {
+            "dataSource": "metrics",
+            "aggregateOperator": "sum",
+            "aggregateAttribute": { "key": "burnrate.tokens.input", "type": "Sum" },
+            "groupBy": [{ "key": "burnrate.agent.id" }]
+          },
+          "hit_rate": {
+            "expression": "cache_read / (input + cache_read) * 100"
+          }
+        }
+      },
+      "unit": "%"
+    },
+    {
+      "id": "cost_per_output_token",
+      "title": "Cost per Output Token by Model (USD)",
+      "description": "Normalized cost efficiency. Model misroute shows as a sudden jump on an agent.",
+      "panelType": "graph",
+      "query": {
+        "queryType": "builder",
+        "builderQueries": {
+          "cost": {
+            "dataSource": "metrics",
+            "aggregateOperator": "sum",
+            "aggregateAttribute": { "key": "burnrate.cost.usd", "type": "Sum" },
+            "groupBy": [{ "key": "gen_ai.request.model" }, { "key": "burnrate.agent.id" }]
+          },
+          "tokens": {
+            "dataSource": "metrics",
+            "aggregateOperator": "sum",
+            "aggregateAttribute": { "key": "burnrate.tokens.output", "type": "Sum" },
+            "groupBy": [{ "key": "gen_ai.request.model" }, { "key": "burnrate.agent.id" }]
+          },
+          "cost_per_token": {
+            "expression": "cost / tokens"
+          }
+        }
+      },
+      "unit": "USD/token"
+    },
+    {
+      "id": "model_distribution",
+      "title": "Spend by Model (last 1h)",
+      "description": "Pie of cost by gen_ai.request.model. Model misroute is visible as an unexpected model taking share.",
+      "panelType": "pie",
+      "query": {
+        "queryType": "builder",
+        "builderQueries": {
+          "A": {
+            "dataSource": "metrics",
+            "aggregateOperator": "sum",
+            "aggregateAttribute": { "key": "burnrate.cost.usd", "type": "Sum" },
+            "groupBy": [{ "key": "gen_ai.request.model" }]
+          }
+        }
+      }
+    },
+    {
+      "id": "input_token_trend",
+      "title": "Input Tokens per Call (p95 by Agent)",
+      "description": "Rising p95 = prompt bloat. Sudden jump = context not being cleared between calls.",
+      "panelType": "graph",
+      "query": {
+        "queryType": "builder",
+        "builderQueries": {
+          "A": {
+            "dataSource": "metrics",
+            "aggregateOperator": "p95",
+            "aggregateAttribute": { "key": "burnrate.tokens.input", "type": "Histogram" },
+            "groupBy": [{ "key": "burnrate.agent.id" }]
+          }
+        }
+      },
+      "unit": "tokens"
+    }
+  ]
+}
