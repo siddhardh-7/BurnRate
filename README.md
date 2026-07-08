@@ -35,13 +35,13 @@ See [docs/semconv-proposal.md](docs/semconv-proposal.md) for the full proposal t
 │  → enriches spans with gen_ai.usage.cost.*          │
 │  → emits burnrate.cost.usd metrics by agent/task    │
 └──────────────┬──────────────────────────────────────┘
-               │ OTLP
+               │ OTLP (gRPC :4317 / HTTP :4318)
                ▼
-         SigNoz Cloud
+         SigNoz (Cloud or self-hosted)
     (traces · metrics · alerts)
-               │ alert webhook
+               │ alert webhook → http://host.docker.internal:8082/alert
                ▼
-      Cost Guard Agent (Claude + SigNoz MCP)
+      Cost Guard Agent (Claude + SigNoz MCP :8000)
       → diagnoses culprit → acts → Slack report
 ```
 
@@ -63,14 +63,26 @@ pip install burnrate-otel
 ```
 
 ```python
+from opentelemetry import metrics, trace
+from opentelemetry.sdk.metrics import MeterProvider
+from opentelemetry.sdk.metrics.export import PeriodicExportingMetricReader
+from opentelemetry.exporter.otlp.proto.grpc.metric_exporter import OTLPMetricExporter
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
 from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
 from burnrate import BurnrateSpanProcessor
 
+# IMPORTANT: MeterProvider MUST be set before BurnrateSpanProcessor is instantiated.
+# BurnrateSpanProcessor captures the global MeterProvider at init time to emit cost
+# metrics. If you set MeterProvider after, cost metrics will go to a no-op provider.
+metric_reader = PeriodicExportingMetricReader(OTLPMetricExporter())
+meter_provider = MeterProvider(metric_readers=[metric_reader])
+metrics.set_meter_provider(meter_provider)
+
 provider = TracerProvider()
-provider.add_span_processor(BurnrateSpanProcessor())  # ← this is all you need
+provider.add_span_processor(BurnrateSpanProcessor())  # ← one line, zero config
 provider.add_span_processor(BatchSpanProcessor(OTLPSpanExporter()))
+trace.set_tracer_provider(provider)
 ```
 
 Your GenAI spans now carry `gen_ai.usage.cost.total` (and breakdown by input/output/cache/reasoning). Cost metrics flow to SigNoz automatically.
@@ -99,16 +111,38 @@ Your GenAI spans now carry `gen_ai.usage.cost.total` (and breakdown by input/out
 
 Cost Guard watches SigNoz alerts. When a budget alert fires, it:
 
-1. **Investigates** via the [official SigNoz MCP server](https://signoz.io/docs/ai/signoz-mcp-server/) — querying traces, metrics, and logs to find the culprit
+1. **Investigates** via the [official SigNoz MCP server](https://signoz.io/docs/ai/signoz-mcp-server/) at `http://localhost:8000/mcp` — querying traces, metrics, and logs to find the culprit
 2. **Diagnoses** — which agent, which operation, which failure pattern (retry loop, model misroute, prompt bloat, cache miss storm)
 3. **Acts** — throttles the culprit agent via the demo app's control API (burn rate drops within 60s)
 4. **Reports** — structured Slack incident report with dollar impact, evidence, and actions taken
+
+### Mock Mode
+
+Cost Guard runs in mock mode by default (`COST_GUARD_MOCK=true`) — it returns a realistic synthetic diagnosis without calling the Anthropic API. This lets you demo the full E2E loop (alert → diagnose → throttle → report) without Anthropic credits.
+
+To use real LLM investigation:
+```bash
+# In .env
+COST_GUARD_MOCK=false
+ANTHROPIC_API_KEY=sk-ant-...
+```
+
+### SigNoz Notification Channel Setup
+
+In SigNoz **Settings → Notification Channels**, create a webhook channel pointing to:
+```
+http://host.docker.internal:8082/alert
+```
+
+> **Important:** Use `host.docker.internal`, NOT `localhost`. SigNoz runs inside Docker containers; `localhost` resolves to the container itself, not your host machine where Cost Guard listens.
+
+For EC2 deployments, use the private IP of the Cost Guard host instead.
 
 Example Slack output:
 ```
 🔥 Budget Burn Rate Alert — CRITICAL
 Summary: researcher-agent stuck in a 42-iteration retry loop on topic "LLM trends"
-Culprit: researcher-v1 → invoke_agent
+Culprit: researcher-v1 → gen_ai chat
 Root cause: Error handling bug causes unbounded retries. Each retry consumes ~78k tokens
             on claude-sonnet-4-6 (vs expected haiku). Context grows with each iteration.
 Cost impact: $5.80/hr · $139/day projected
@@ -142,23 +176,28 @@ span.set_attribute("burnrate.feature", "research-pipeline")
 
 ## Chaos Demo Scenarios
 
-The demo app ships four injectable cost failure modes for live demos:
+The demo app ships four injectable cost failure modes for live demos (demo app runs on port **8001**):
 
 ```bash
 # Start a cost spike — researcher retries every call 8-12 times
-curl -X POST http://localhost:8000/chaos/activate/retry_loop
+curl -X POST http://localhost:8001/chaos/activate/retry_loop
 
 # Route all cheap tasks to an expensive model (20× cost)
-curl -X POST http://localhost:8000/chaos/activate/model_misroute
+curl -X POST http://localhost:8001/chaos/activate/model_misroute
 
 # Context accumulates without summarization (cost grows per call)
-curl -X POST http://localhost:8000/chaos/activate/prompt_bloat
+curl -X POST http://localhost:8001/chaos/activate/prompt_bloat
 
 # Slight prompt variations defeat Anthropic caching (cache savings lost)
-curl -X POST http://localhost:8000/chaos/activate/cache_miss_storm
+curl -X POST http://localhost:8001/chaos/activate/cache_miss_storm
 
 # Back to normal
-curl -X POST http://localhost:8000/chaos/deactivate
+curl -X POST http://localhost:8001/chaos/deactivate
+```
+
+Generate traffic to see cost flow:
+```bash
+curl -X POST "http://localhost:8001/research/batch?count=5"
 ```
 
 ---
@@ -179,7 +218,7 @@ cp .env.example .env && nano .env  # fill in keys
 docker compose up -d
 ```
 
-Configure your SigNoz alert webhook to point to `http://<ec2-ip>:8080/alert`.
+Configure your SigNoz alert webhook to point to `http://<ec2-ip>:8082/alert`.
 
 ---
 
@@ -189,11 +228,24 @@ Configure your SigNoz alert webhook to point to `http://<ec2-ip>:8080/alert`.
 burnrate/
 ├── packages/burnrate-otel/   # pip-installable SDK (the core)
 ├── cost-guard/               # Claude + SigNoz MCP incident agent
-├── demo-app/                 # Multi-agent demo with chaos injection
+├── demo-app/                 # Multi-agent demo with chaos injection (port 8001)
 ├── dashboards/               # Importable SigNoz dashboard JSONs
 ├── alerts/                   # SigNoz alert rule YAML definitions
 └── docs/semconv-proposal.md  # Formal proposal: gen_ai.usage.cost.*
 ```
+
+---
+
+## Ports Reference
+
+| Service | Port | Purpose |
+|---|---|---|
+| Demo App | 8001 | FastAPI + chaos endpoints |
+| Cost Guard | 8082 | SigNoz alert webhook receiver |
+| SigNoz UI | 8080 | Dashboard, alerts, traces |
+| SigNoz MCP | 8000 | AI tool access (`/mcp`) |
+| OTLP gRPC | 4317 | Trace + metric ingestion |
+| OTLP HTTP | 4318 | Trace + metric ingestion (alt) |
 
 ---
 

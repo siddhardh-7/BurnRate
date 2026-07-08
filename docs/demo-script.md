@@ -1,11 +1,15 @@
 # 3-Minute Demo Script
 
 ## Setup (before recording)
-- Demo app running, generating baseline traffic: `docker-compose up`
-- SigNoz "Burn Rate Live" dashboard open on screen, burn rate showing ~$0.14/hr (normal)
+
+- Demo app running on port 8001: `cd demo-app && uv run python -m demo.app`
+- Cost Guard running on port 8082: `cd cost-guard && uv run python -m guard.webhook`
+- SigNoz "Burn Rate Live" dashboard open, burn rate showing baseline traffic
 - Terminal 2: Cost Guard logs tailing: `docker compose logs -f cost-guard`
+  (or `tail -f /tmp/cost-guard.log` for local run)
 - Terminal 3: ready for chaos injection commands
 - Slack open on side showing no alerts
+- SigNoz notification channel configured to `http://host.docker.internal:8082/alert`
 
 ---
 
@@ -33,11 +37,11 @@
 
 ### [0:45–1:00] Inject Chaos
 
-**Run in terminal:**
+**Run in terminal (demo app is on port 8001):**
 ```bash
-curl -X POST http://localhost:8000/chaos/activate/retry_loop
+curl -X POST http://localhost:8001/chaos/activate/retry_loop
 # Then fire 10 concurrent requests:
-for i in $(seq 1 10); do curl -s -X POST "http://localhost:8000/research?topic=AI+observability" & done; wait
+for i in $(seq 1 10); do curl -s -X POST "http://localhost:8001/research?topic=AI+observability" & done; wait
 ```
 
 **Narrate:**
@@ -54,48 +58,47 @@ for i in $(seq 1 10); do curl -s -X POST "http://localhost:8000/research?topic=A
 
 **Show:** Cost Guard logs showing:
 ```
-INFO  Alert received: Burnrate: Budget Burn Rate Critical  state=firing
-INFO  Investigating alert='Burnrate: Budget Burn Rate Critical' service='burnrate-demo-app'
+INFO  Alert received: BurnRateBudgetAlert  status=firing
+INFO  Investigating alert='BurnRateBudgetAlert' service='burnrate-demo-app'
 INFO  [SigNoz MCP] signoz_query_metrics → burnrate.cost.usd by agent: researcher-v1=5.8/hr
-INFO  [SigNoz MCP] signoz_search_traces → 847 spans from researcher-v1 in last 10min
-INFO  [SigNoz MCP] signoz_search_logs → 42 retry warnings from researcher-v1
-INFO  Diagnosis complete. Cost impact: $5.80/hr
+INFO  [SigNoz MCP] signoz_search_traces → 47 spans from researcher-v1 in last 10min
+INFO  Diagnosis: culprit=researcher-v1 confidence=high cost=10.98/hr
+INFO  ACTION: throttled agent=researcher-v1 to 2 calls/min
 ```
 
 ---
 
 ### [1:30–2:10] The Report
 
-**Narrate while Slack notification appears:**
-> "30 seconds later. Slack."
+**Narrate while Slack notification appears (or terminal output if no Slack):**
+> "30 seconds later."
 
-**Show the Slack message (full text):**
+**Show the incident report:**
 ```
-🔥 Burnrate: Budget Burn Rate Critical — CRITICAL
-Summary: researcher-agent stuck in a 42-iteration retry loop consuming ~78k tokens per task
-Culprit: researcher-v1 → invoke_agent
-Root cause: Error handling bug causes unbounded retries. Each retry re-sends full context.
-            claude-sonnet-4-6 used due to model_misroute (expected haiku).
-Cost impact: $5.80/hr · $139.20/day projected
+🔥 BurnRateBudgetAlert — CRITICAL
+Summary: researcher-v1 is stuck in a retry loop causing 8-10x cost spike on burnrate-demo-app
+Culprit: researcher-v1 → gen_ai chat
+Root cause: SigNoz traces show researcher-v1 making 8-12 LLM calls per research task
+            instead of 1. Input tokens grew from ~170 to ~1,400 per task due to retry context.
+            Burn rate jumped from $0.0003/min to $0.0028/min — a 9.3x spike.
+Cost impact: $10.98/hr · $263.52/day projected
 Confidence: high
 Evidence:
-  • burnrate.cost.usd{agent=researcher-v1}: $0.14 → $5.80/hr at 14:32 (41× spike)
-  • 847 spans from researcher-v1 in 10 min (baseline: ~20)
-  • Trace abc123: 42 child LLM spans, all context growing, all retrying
-Actions:
-  1. Kill the retry loop — set MAX_RETRIES=3 in ResearchAgent
-  2. Route topic-research tasks back to haiku (save 20× on model cost)
-  3. Add circuit breaker to prevent unbounded retries
+  • burnrate.cost.usd rate: 0.000047/s → 0.000183/s (3.9x above threshold)
+  • researcher-v1 span count: 47 spans in 15min vs 5 baseline (9.4x normal)
+  • gen_ai.usage.input_tokens p95: 1,387 tokens vs 171 baseline
+Actions taken by Cost Guard:
+  ✓ Throttled researcher-v1 to 2 calls/min — burn rate will drop within 60s
 ```
 
-> "$139 a day. From one bug. Found in 30 seconds. No dashboards, no manual trace hunting."
+> "$263 a day. From one bug. Found in 30 seconds. No dashboards, no manual trace hunting."
 
 ---
 
 ### [2:10–2:35] The Evidence
 
 **Show in SigNoz:**
-1. "Burnrate Live" dashboard — burn rate spike clearly visible at 14:32
+1. "Burnrate Live" dashboard — burn rate spike clearly visible
 2. "Cost by Agent" — researcher-v1 dwarfs summarizer-v1
 3. Click into a trace — show a span with `gen_ai.usage.cost.total = 0.0847` and `gen_ai.usage.input_tokens = 78432`
 
@@ -118,3 +121,9 @@ Actions:
 ## Backup Demo (if live chaos fails)
 
 Pre-recorded GIF of the burn rate spike → Cost Guard → Slack report. Embed in README and show in browser tab if live system has issues.
+
+## Troubleshooting
+
+- **Cost Guard not receiving alerts**: SigNoz runs in Docker — webhook URL must be `http://host.docker.internal:8082/alert`, not `localhost`
+- **Dashboard showing 0**: Demo app must be running and generating live requests (Rate aggregate needs ongoing data points)
+- **Mock mode**: `COST_GUARD_MOCK=true` returns synthetic diagnosis without Anthropic credits — still demonstrates the full loop

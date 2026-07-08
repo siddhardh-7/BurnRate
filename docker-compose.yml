@@ -22,17 +22,22 @@ services:
     environment:
       PORT: "8082"
       DEMO_APP_URL: "http://demo-app:8001"
+      # SIGNOZ_MCP_URL and COST_GUARD_MOCK come from .env
     depends_on:
       - demo-app
     restart: unless-stopped
 
-  # Uncomment if using self-hosted SigNoz instead of SigNoz Cloud
+  # Uncomment if using self-hosted SigNoz instead of SigNoz Cloud.
+  # Note: configure the alert notification channel webhook URL as
+  # http://host.docker.internal:8082/alert (NOT localhost) so SigNoz
+  # containers can reach Cost Guard on the host.
   # signoz:
   #   image: signoz/signoz:latest
   #   ports:
-  #     - "3301:3301"
-  #     - "4317:4317"
-  #     - "4318:4318"
+  #     - "8080:8080"   # UI
+  #     - "8000:8000"   # MCP server
+  #     - "4317:4317"   # OTLP gRPC
+  #     - "4318:4318"   # OTLP HTTP
   #   volumes:
   #     - signoz-data:/var/lib/clickhouse
 
