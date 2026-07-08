@@ -50,7 +50,7 @@ See [docs/semconv-proposal.md](docs/semconv-proposal.md) for the full proposal t
 ## Quick Start
 
 ```bash
-git clone https://github.com/yourusername/burnrate
+git clone https://github.com/siddhardh-7/BurnRate.git
 cd burnrate
 cp .env.example .env   # add SIGNOZ_API_KEY + ANTHROPIC_API_KEY
 docker-compose up
