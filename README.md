@@ -12,6 +12,10 @@
 </p>
 
 <p align="center">
+  <strong><a href="https://siddhardh-7.github.io/BurnRate/">🌐 View the interactive website →</a></strong>
+</p>
+
+<p align="center">
   <a href="#quickstart">Quickstart</a> · <a href="#cost-guard-agent">Cost Guard</a> · <a href="#dashboards">Dashboards</a> · <a href="#semconv-proposal">Semconv Proposal</a> · <a href="#chaos-demo">Demo</a>
 </p>
 
