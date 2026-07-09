@@ -292,6 +292,14 @@
     border-bottom: 1px solid var(--border);
     background: var(--surface);
   }
+  .contrast-eyebrow {
+    text-align: center;
+    padding: 2rem 1rem 0;
+    font-size: 0.8125rem;
+    font-style: italic;
+    color: var(--ink-muted);
+    letter-spacing: 0.01em;
+  }
   .contrast-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -1306,7 +1314,7 @@
     <div class="hero-grid">
 
       <div class="hero-left">
-        <div class="hero-flag">FinOps for AI Agents · built on <span class="sz-name">SigNoz</span></div>
+        <div class="hero-flag">Agent-Native Observability · built on <span class="sz-name">SigNoz</span></div>
         <h1>
           The OTel GenAI spec tracks every token.<br>
           It tracks <em>zero dollars.</em>
@@ -1357,6 +1365,7 @@ provider.add_span_processor(
 <!-- ── BEFORE / AFTER ─────────────────────────────────────── -->
 <section class="contrast" aria-label="Before and after Burnrate">
   <div class="wrap">
+    <div class="contrast-eyebrow">"If you can't observe your AI agents, you don't own them."</div>
     <div class="contrast-grid">
 
       <div class="c-col before">
@@ -1366,11 +1375,11 @@ provider.add_span_processor(
         <ul class="c-list">
           <li>
             <svg class="c-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-            Token counts sit in your traces — but nobody converts them to dollars
+            Your AI agents are a cost black box — tokens tracked, dollars invisible
           </li>
           <li>
             <svg class="c-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-            A retry loop burns money overnight and no alert fires
+            A retry loop burns money overnight — no alert fires, you're flying blind
           </li>
           <li>
             <svg class="c-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
@@ -1390,7 +1399,7 @@ provider.add_span_processor(
         <ul class="c-list">
           <li>
             <svg class="c-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
-            Every span carries its exact dollar cost, at query time
+            Full visibility into every AI call — exact dollar cost on every span
           </li>
           <li>
             <svg class="c-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
@@ -1537,6 +1546,7 @@ provider.add_span_processor(
         <div>
           <h2>Built on SigNoz, end to end</h2>
           <p>
+            Traces, metrics, and logs — all in one OpenTelemetry-native platform.
             The cost metric lands in SigNoz dashboards, the budget alert is a SigNoz
             alert rule, and Cost Guard runs its whole investigation through SigNoz's
             official MCP server. One open-source platform carries the entire loop —
@@ -1545,9 +1555,10 @@ provider.add_span_processor(
         </div>
       </div>
       <ul class="sz-points">
-        <li><strong>Dashboards</strong> — burnrate.cost.usd charted per agent, model, and service</li>
+        <li><strong>Traces</strong> — every gen_ai span enriched with cost, queryable in SigNoz trace explorer</li>
+        <li><strong>Metrics</strong> — burnrate.cost.usd charted per agent, model, and service in real time</li>
         <li><strong>Alerts</strong> — BurnRateBudgetAlert watches real dollars, not proxy metrics</li>
-        <li><strong>MCP server</strong> — the eyes Cost Guard investigates with: traces, metrics, logs</li>
+        <li><strong>MCP server</strong> — Cost Guard's investigation tool: queries traces, metrics, and logs autonomously</li>
       </ul>
     </div>
   </div>
