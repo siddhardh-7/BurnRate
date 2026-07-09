@@ -16,7 +16,7 @@
 </p>
 
 <p align="center">
-  <a href="#quickstart">Quickstart</a> · <a href="#cost-guard-agent">Cost Guard</a> · <a href="#dashboards">Dashboards</a> · <a href="#semconv-proposal">Semconv Proposal</a> · <a href="#chaos-demo">Demo</a>
+  <a href="#quickstart">Quickstart</a> · <a href="#cost-guard-agent">Cost Guard</a> · <a href="#dashboards">Dashboards</a> · <a href="#semconv-proposal">Semconv Proposal</a> · <a href="#chaos-demo-scenarios">Demo</a>
 </p>
 
 ---
@@ -99,8 +99,13 @@ The Cost Guard uses **SigNoz's official MCP server** — it doesn't call SigNoz 
 ```bash
 git clone https://github.com/siddhardh-7/BurnRate.git
 cd BurnRate
-cp .env.example .env        # fill in SIGNOZ_API_KEY + ANTHROPIC_API_KEY
-docker-compose up
+cp .env.example .env        # fill in ANTHROPIC_API_KEY (or leave COST_GUARD_MOCK=true)
+
+# Install SigNoz via Foundry (reads casting.yaml, starts SigNoz + MCP server)
+foundryctl cast
+
+# Then start Burnrate services (joins SigNoz network automatically)
+docker-compose up --build
 ```
 
 Then in another terminal:
@@ -215,7 +220,7 @@ Cost Guard is a Claude-powered incident response agent that turns SigNoz budget 
 When a budget alert fires:
 
 1. **Receives** the SigNoz webhook at `POST /alert`
-2. **Connects** to SigNoz's official MCP server (`http://localhost:8000/mcp`) — 8 cost-relevant tools available
+2. **Connects** to SigNoz's official MCP server (port 8000, via `signoz-mcp` container on the shared Docker network) — 8 cost-relevant tools available
 3. **Investigates** via a multi-turn tool-use loop: queries `burnrate.cost.usd` metrics, searches traces for the culprit agent, inspects token counts and retry patterns
 4. **Diagnoses** — root cause, culprit agent, culprit operation, evidence, estimated hourly cost
 5. **Acts** — throttles the culprit via the demo app's control API; burn rate drops within 60 seconds
@@ -253,13 +258,19 @@ Recommended next steps:
 
 ### Setup
 
-In SigNoz **Settings → Notification Channels**, create a Webhook channel:
+In SigNoz **Settings → Notification Channels**, create a Webhook channel.
 
+**Docker Compose** (both SigNoz and Cost Guard on `signoz-network`):
+```
+http://burnrate-cost-guard:8082/alert
+```
+
+**Local development** (SigNoz in Docker via foundryctl, Cost Guard running via `uv run`):
 ```
 http://host.docker.internal:8082/alert
 ```
 
-> `host.docker.internal` resolves to your Mac/EC2 host from inside Docker containers. Using `localhost` points to the container itself and will fail silently.
+> Never use `localhost` — it resolves to the SigNoz container itself, not your host machine.
 
 ### Mock mode
 
@@ -327,14 +338,20 @@ If standardized, `gen_ai.usage.cost.total` would let SigNoz, Grafana, Datadog, a
 ## AWS Deployment
 
 ```bash
-# EC2 — Ubuntu 24.04, t3.medium or larger
+# EC2 — Ubuntu 24.04, t3.medium or larger (4GB RAM minimum)
 sudo apt-get update && sudo apt-get install -y docker.io docker-compose-plugin
+curl -sL https://dl.signoz.io/foundryctl/install.sh | bash
 git clone https://github.com/siddhardh-7/BurnRate.git && cd BurnRate
-cp .env.example .env && nano .env   # SIGNOZ_API_KEY, ANTHROPIC_API_KEY
+cp .env.example .env && nano .env   # fill in ANTHROPIC_API_KEY
+
+# Install SigNoz via Foundry (casting.yaml + casting.yaml.lock are in the repo)
+foundryctl cast
+
+# Start Burnrate services
 docker compose up -d
 
-# SigNoz notification channel webhook URL for EC2:
-# http://<private-ip>:8082/alert
+# SigNoz notification channel webhook URL (container name resolves on signoz-network):
+# http://burnrate-cost-guard:8082/alert
 ```
 
 ---

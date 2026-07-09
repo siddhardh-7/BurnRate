@@ -6,7 +6,7 @@ RUN apt-get update && apt-get install -y wget && \
     -O /usr/local/bin/signoz-mcp-server && \
     chmod +x /usr/local/bin/signoz-mcp-server && \
     apt-get remove -y wget && apt-get autoremove -y && rm -rf /var/lib/apt/lists/*
-COPY pyproject.toml .
+COPY cost-guard/pyproject.toml .
 RUN pip install --no-cache-dir -e .
-COPY . .
+COPY cost-guard/src ./src
 CMD ["python", "-m", "guard.webhook"]
