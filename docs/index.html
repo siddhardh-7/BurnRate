@@ -44,10 +44,10 @@
     --surface:     #f8fafc;
     --surface-alt: #f1f5f9;
     --border:      #e2e8f0;
-    --amber:       #d97706;
-    --amber-dark:  #b45309;
-    --amber-bg:    #fffbeb;
-    --amber-bdr:   #fde68a;
+    --amber:       #ea580c;
+    --amber-dark:  #c2410c;
+    --amber-bg:    #fff7ed;
+    --amber-bdr:   #fdba74;
     --loss:        #dc2626;
     --loss-bg:     #fef2f2;
     --gain:        #059669;
@@ -569,7 +569,7 @@
     background: var(--amber);
     color: white;
   }
-  .btn-amber:hover { background: var(--amber-dark); box-shadow: 0 4px 20px rgba(217,119,6,0.35); }
+  .btn-amber:hover { background: var(--amber-dark); box-shadow: 0 4px 20px rgba(234,88,12,0.35); }
   .btn-amber:focus-visible { outline-color: white; }
 
   /* ── Demo Tab ─────────────────────────────────────────── */
@@ -610,7 +610,7 @@
     gap: 1.125rem;
     transition: border-color 0.2s, box-shadow 0.2s;
   }
-  .cmode:hover { border-color: var(--amber-bdr); box-shadow: 0 6px 20px rgba(217,119,6,0.08); }
+  .cmode:hover { border-color: var(--amber-bdr); box-shadow: 0 6px 20px rgba(234,88,12,0.08); }
   .cmode-ico {
     width: 40px; height: 40px;
     background: var(--amber-bg);
@@ -712,7 +712,7 @@
   button.cmode:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
   button.cmode[aria-pressed="true"] {
     border-color: var(--amber);
-    box-shadow: 0 0 0 1px var(--amber), 0 8px 24px rgba(217,119,6,0.12);
+    box-shadow: 0 0 0 1px var(--amber), 0 8px 24px rgba(234,88,12,0.12);
   }
   button.cmode:disabled { opacity: 0.55; cursor: not-allowed; }
   button.cmode:disabled:hover { border-color: var(--border); box-shadow: none; }
@@ -1639,7 +1639,7 @@ provider.add_span_processor(<span class="fn">BurnrateSpanProcessor</span>())
     <div class="agent-select" role="radiogroup" aria-label="Target agent">
       <span class="as-label">Target agent</span>
       <button class="as-btn" data-agent="researcher" role="radio" aria-checked="true">
-        <span class="as-dot" style="background:#d97706"></span>researcher-v1
+        <span class="as-dot" style="background:#ea580c"></span>researcher-v1
       </button>
       <button class="as-btn" data-agent="summarizer" role="radio" aria-checked="false">
         <span class="as-dot" style="background:#3b82f6"></span>summarizer-v1
@@ -1723,7 +1723,7 @@ provider.add_span_processor(<span class="fn">BurnrateSpanProcessor</span>())
         This chart is live right now — the flat lines are your two agents idling. Click a failure card above (or the burn button) and watch them react.
       </div>
       <div class="chart-legend" aria-hidden="true">
-        <span class="lg-item"><span class="lg-swatch" style="background:#d97706"></span>researcher-v1 <strong id="lg-r">$0.80</strong></span>
+        <span class="lg-item"><span class="lg-swatch" style="background:#ea580c"></span>researcher-v1 <strong id="lg-r">$0.80</strong></span>
         <span class="lg-item"><span class="lg-swatch" style="background:#3b82f6"></span>summarizer-v1 <strong id="lg-s">$0.45</strong></span>
       </div>
       <canvas id="sim-chart" aria-label="Live time-series chart of cost per minute for each agent, with the alert threshold line"></canvas>
@@ -1863,7 +1863,7 @@ provider.add_span_processor(<span class="fn">BurnrateSpanProcessor</span>())
     let threshold = 4;
 
     const AGENTS = {
-      researcher: { name: 'researcher-v1', base: 0.8,  color: '#d97706', fill: 'rgba(217,119,6,0.09)',  noise: 0.12 },
+      researcher: { name: 'researcher-v1', base: 0.8,  color: '#ea580c', fill: 'rgba(234,88,12,0.09)',  noise: 0.12 },
       summarizer: { name: 'summarizer-v1', base: 0.45, color: '#3b82f6', fill: 'rgba(59,130,246,0.08)', noise: 0.08 }
     };
     let victim = 'researcher';
@@ -2192,7 +2192,7 @@ provider.add_span_processor(<span class="fn">BurnrateSpanProcessor</span>())
     const canvas = document.getElementById('spark-canvas');
     const ctx = canvas.getContext('2d');
 
-    const SPARK_COLOR  = '#d97706';
+    const SPARK_COLOR  = '#ea580c';
     const SPARK_SIZE   = 10;
     const SPARK_RADIUS = 22;
     const SPARK_COUNT  = 8;
