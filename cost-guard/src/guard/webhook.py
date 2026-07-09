@@ -29,6 +29,36 @@ from .report import build_report, send_slack
 log = logging.getLogger(__name__)
 
 _WEBHOOK_SECRET = os.getenv("WEBHOOK_SECRET", "")
+_OTLP_ENDPOINT = os.getenv("OTLP_ENDPOINT", "http://localhost:4317")
+
+
+def _setup_otel_logging() -> None:
+    """
+    Export Cost Guard's logs to SigNoz. These log lines ARE the incident
+    narrative — alert received → diagnosis → throttle action — so shipping
+    them makes the whole self-healing loop visible in the SigNoz Logs view.
+    Best-effort: if the OTLP endpoint is unreachable, console logging still works.
+    """
+    try:
+        from opentelemetry._logs import set_logger_provider
+        from opentelemetry.exporter.otlp.proto.grpc._log_exporter import OTLPLogExporter
+        from opentelemetry.sdk._logs import LoggerProvider, LoggingHandler
+        from opentelemetry.sdk._logs.export import BatchLogRecordProcessor
+        from opentelemetry.sdk.resources import SERVICE_NAME, Resource
+
+        provider = LoggerProvider(resource=Resource({SERVICE_NAME: "burnrate-cost-guard"}))
+        provider.add_log_record_processor(
+            BatchLogRecordProcessor(OTLPLogExporter(endpoint=_OTLP_ENDPOINT))
+        )
+        set_logger_provider(provider)
+        logging.getLogger().addHandler(
+            LoggingHandler(level=logging.INFO, logger_provider=provider)
+        )
+    except Exception:
+        log.warning("OTel log export unavailable — console logging only", exc_info=True)
+
+
+_setup_otel_logging()
 
 
 @asynccontextmanager

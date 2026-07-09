@@ -1,5 +1,3 @@
-version: '3.8'
-
 # Burnrate services only — SigNoz is managed separately via:
 #   cd pours/deployment && docker compose -f compose.yaml up -d
 #
@@ -47,6 +45,8 @@ services:
       # SigNoz API + MCP (service names from pours/deployment/compose.yaml)
       SIGNOZ_API_URL: http://signoz-signoz-0:8080
       SIGNOZ_MCP_URL: http://signoz-mcp:8000/mcp
+      # SigNoz OTel ingester — Cost Guard ships its incident logs here
+      OTLP_ENDPOINT: http://signoz-ingester:4317
       # Demo app throttle target (internal burnrate network)
       DEMO_APP_URL: http://demo-app:8001
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-key_not_set}
