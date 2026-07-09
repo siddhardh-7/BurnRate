@@ -1,45 +1,124 @@
-version: "3.9"
+version: '3.8'
 
 services:
+  # SigNoz backend — ClickHouse database for traces, metrics, logs
+  clickhouse:
+    image: clickhouse/clickhouse-server:24.1-alpine
+    container_name: burnrate-clickhouse
+    environment:
+      CLICKHOUSE_DB: signoz
+    volumes:
+      - clickhouse-data:/var/lib/clickhouse
+    ports:
+      - "9000:9000"
+      - "8123:8123"
+    networks:
+      - burnrate
+    healthcheck:
+      test: ["CMD", "clickhouse-client", "--host=127.0.0.1", "-q", "SELECT 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # OTel Collector — receives spans/metrics from demo-app
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.92.0
+    container_name: burnrate-otel-collector
+    command:
+      - "--config=/etc/otel-collector-config.yml"
+    volumes:
+      - ./docker/otel-collector-config.yml:/etc/otel-collector-config.yml:ro
+    ports:
+      - "4317:4317"    # OTLP gRPC
+      - "4318:4318"    # OTLP HTTP
+    depends_on:
+      clickhouse:
+        condition: service_healthy
+    networks:
+      - burnrate
+    environment:
+      GOGC: "80"
+
+  # SigNoz server — UI, dashboards, alerts, MCP
+  signoz-server:
+    image: signoz/signoz:0.50.1
+    container_name: burnrate-signoz
+    command:
+      - "server"
+      - "--storage=clickhouse"
+      - "--clickhouseUrl=tcp://clickhouse:9000"
+    ports:
+      - "8080:8080"    # UI
+      - "8000:8000"    # MCP server
+    depends_on:
+      - clickhouse
+      - otel-collector
+    networks:
+      - burnrate
+    environment:
+      ALERTMANAGER_API_PREFIX: "/api/v1/alerts"
+      SIGNOZ_LOCAL_DB_PATH: /var/lib/signoz/signoz.db
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  # Demo app — researcher-v1 and summarizer-v1 agents
   demo-app:
     build:
-      context: .                      # project root — gives Dockerfile access to packages/burnrate-otel
+      context: .
       dockerfile: demo-app/Dockerfile
+    container_name: burnrate-demo-app
     ports:
       - "8001:8001"
-    env_file: .env
+    depends_on:
+      - otel-collector
+    networks:
+      - burnrate
     environment:
-      PORT: "8001"
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
+      OTEL_SERVICE_NAME: demo-app
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-key_not_set}
+      SIGNOZ_API_KEY: ${SIGNOZ_API_KEY:-}
+    env_file: .env
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
+  # Cost Guard — autonomous incident responder
   cost-guard:
     build:
-      context: ./cost-guard
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: cost-guard/Dockerfile
+    container_name: burnrate-cost-guard
     ports:
       - "8082:8082"
-    env_file: .env
-    environment:
-      PORT: "8082"
-      DEMO_APP_URL: "http://demo-app:8001"
-      # SIGNOZ_MCP_URL and COST_GUARD_MOCK come from .env
     depends_on:
-      - demo-app
+      - signoz-server
+    networks:
+      - burnrate
+    environment:
+      SIGNOZ_BASE_URL: http://signoz-server:8080
+      SIGNOZ_MCP_URL: http://signoz-server:8000/mcp
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-key_not_set}
+      SIGNOZ_API_KEY: ${SIGNOZ_API_KEY:-}
+      WEBHOOK_PORT: "8082"
+    env_file: .env
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8082/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
-  # Uncomment if using self-hosted SigNoz instead of SigNoz Cloud.
-  # Note: configure the alert notification channel webhook URL as
-  # http://host.docker.internal:8082/alert (NOT localhost) so SigNoz
-  # containers can reach Cost Guard on the host.
-  # signoz:
-  #   image: signoz/signoz:latest
-  #   ports:
-  #     - "8080:8080"   # UI
-  #     - "8000:8000"   # MCP server
-  #     - "4317:4317"   # OTLP gRPC
-  #     - "4318:4318"   # OTLP HTTP
-  #   volumes:
-  #     - signoz-data:/var/lib/clickhouse
+networks:
+  burnrate:
+    driver: bridge
 
-# volumes:
-#   signoz-data:
+volumes:
+  clickhouse-data:
+    driver: local
