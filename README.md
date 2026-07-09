@@ -12,7 +12,7 @@
 </p>
 
 <p align="center">
-  <strong><a href="https://siddhardh-7.github.io/BurnRate/">🌐 View the interactive website →</a></strong>
+  <strong><a href="https://siddhardh-7.github.io/BurnRate/">🌐 View the interactive website →</a></strong> · <a href="SETUP.md"><strong>📖 Deployment guide</strong></a>
 </p>
 
 <p align="center">
