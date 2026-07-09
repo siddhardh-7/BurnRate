@@ -1,4 +1,11 @@
-# Burnrate
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/assets/logo-dark.svg">
+    <img src="docs/assets/logo.svg" width="88" alt="Burnrate — a cost line igniting into a flame">
+  </picture>
+</p>
+
+<h1 align="center">Burnrate</h1>
 
 <p align="center">
   <strong>The OpenTelemetry GenAI spec tracks every token your agents consume.<br>It tracks zero dollars.</strong>

@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Favicon: the flame element alone — the full mark's line is illegible at 16px -->
+  <path d="M16,2 C19.5,7 25,10.5 25,17 a9,9 0 1 1 -18,0 C7,10.5 12.5,7 16,2 Z" fill="#ea580c"/>
+  <path d="M16,11.5 C17.8,14 20,15.5 20,18.5 a4,4 0 1 1 -8,0 C12,15.5 14.2,14 16,11.5 Z" fill="#fbbf24"/>
+</svg>
