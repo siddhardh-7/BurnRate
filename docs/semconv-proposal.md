@@ -1,3 +1,10 @@
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/logo-dark.svg">
+    <img src="assets/logo.svg" width="64" alt="Burnrate logo">
+  </picture>
+</p>
+
 # Proposal: `gen_ai.usage.cost.*` Semantic Convention Attributes
 
 <table>

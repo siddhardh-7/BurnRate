@@ -1,3 +1,10 @@
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/assets/logo-dark.svg">
+    <img src="docs/assets/logo.svg" width="72" alt="Burnrate logo">
+  </picture>
+</p>
+
 # Burnrate — Setup & Deployment Guide
 
 Complete walkthrough for judges and anyone deploying the Burnrate project locally.
