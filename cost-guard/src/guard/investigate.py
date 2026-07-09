@@ -30,7 +30,14 @@ _SIGNOZ_MCP_URL = os.getenv("SIGNOZ_MCP_URL", "http://localhost:8000/mcp")
 _MAX_TOOL_ROUNDS = 8
 
 
-_MOCK_MODE = True  # set COST_GUARD_MOCK=false after adding Anthropic credits
+def _env_bool(name: str, default: bool) -> bool:
+    val = os.getenv(name)
+    if val is None:
+        return default
+    return val.strip().lower() in {"1", "true", "yes", "on"}
+
+
+_MOCK_MODE = _env_bool("COST_GUARD_MOCK", True)  # set COST_GUARD_MOCK=false in .env after adding Anthropic credits
 
 
 async def investigate(alert: dict[str, Any]) -> dict[str, Any]:

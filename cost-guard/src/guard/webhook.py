@@ -8,6 +8,15 @@ from __future__ import annotations
 import logging
 import os
 from contextlib import asynccontextmanager
+from pathlib import Path
+
+from dotenv import load_dotenv
+
+# Must run before importing .investigate — its _MOCK_MODE (and other config) are
+# module-level constants read from os.getenv() at import time, so .env has to be
+# loaded into the process environment first. override=False: real shell/CI env
+# vars still win over .env.
+load_dotenv(Path(__file__).resolve().parents[3] / ".env", override=False)
 
 import uvicorn
 from fastapi import FastAPI, HTTPException, Request
