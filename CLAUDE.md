@@ -42,19 +42,24 @@ Secrets live in `.env` at repo root (SIGNOZ_API_KEY, ANTHROPIC_API_KEY, COST_GUA
   span is read-only. The processor temporarily clears `BoundedAttributes._immutable`
   (OTel SDK 1.43 internal API) to write `gen_ai.usage.cost.*` — fragile across SDK
   upgrades; failures are swallowed so metrics still flow.
-- **SigNoz webhook URL must be `http://host.docker.internal:8082/alert`**, never
-  `localhost` — SigNoz runs in Docker; localhost resolves inside the container.
+- **SigNoz webhook URL is never `localhost`** — SigNoz runs in Docker; localhost
+  resolves inside the container. Local dev mode (cost-guard on host):
+  `http://host.docker.internal:8082/alert`. Docker Compose mode (both on
+  `signoz-network`): `http://burnrate-cost-guard:8082/alert`.
 - **SigNoz alert payloads use `status` (not `state`) and wrap alerts in an
   `alerts[]` array.** Parsing lives in `cost-guard/src/guard/webhook.py`.
 - **Dashboard JSON is SigNoz v5 `widgets` + `layout` format.** A bare `layout`
   array with inline panels imports as an empty dashboard. Table-panel `orderBy`
   must use `__result`, not `value`. Push updates via
   `PUT /api/v1/dashboards/{id}` with the `SIGNOZ-API-KEY` header.
-- **Mock mode:** `_MOCK_MODE = True` is hardcoded in
-  `cost-guard/src/guard/investigate.py` (Anthropic credits were unavailable);
-  `.env` has `COST_GUARD_MOCK=true` but the env var is not yet wired up. Wire it
-  before real-mode demos. In real mode, MCP tools are filtered from 41 to 8 and
-  tool results truncated to 2000 chars to stay under the 10k tokens/min rate limit.
+- **Mock mode:** controlled by `COST_GUARD_MOCK` (default `true`) read at import
+  time in `cost-guard/src/guard/investigate.py`. In real mode, MCP tools are
+  filtered from 41 to 8 and tool results truncated to 2000 chars to stay under
+  the 10k tokens/min rate limit.
+- **Logs pillar:** both services export OTel logs over the same `OTLP_ENDPOINT`
+  gRPC endpoint (demo-app: wired in `app.py` after the tracer; cost-guard:
+  `_setup_otel_logging()` in `webhook.py`, best-effort). Cost-guard's resource
+  is `service.name = burnrate-cost-guard`.
 
 ## Key names
 

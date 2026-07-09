@@ -9,10 +9,12 @@ script matches what the system actually produces — no aspirational output.
 
 Run through this list top to bottom. Do not start recording until every box checks.
 
-- [ ] SigNoz running (UI on `http://localhost:8080`)
+This script assumes **local dev mode**: SigNoz via foundryctl (`pours/deployment/`), demo-app and Cost Guard via `uv run` on the host. For Docker Compose mode, substitute `docker logs -f burnrate-cost-guard` for the log tail and use `http://burnrate-cost-guard:8082/alert` as the webhook URL.
+
+- [ ] SigNoz running (UI on `http://localhost:8080`) — start with `foundryctl cast` if not already up
 - [ ] Demo app running: `cd demo-app && uv run python -m demo.app` (port 8001)
 - [ ] Cost Guard running: `cd cost-guard && uv run python -m guard.webhook 2>&1 | tee /tmp/cost-guard.log` (port 8082)
-- [ ] Verify webhook reachable from SigNoz: notification channel is `http://host.docker.internal:8082/alert` — send a test notification, confirm 200 in Cost Guard logs
+- [ ] Verify webhook reachable from SigNoz: notification channel is `http://host.docker.internal:8082/alert` (SigNoz is in Docker; cost-guard is on the host) — send a test notification, confirm 200 in Cost Guard logs
 - [ ] No throttles left over from testing: `curl -X POST http://localhost:8001/control/restore`
 - [ ] Chaos deactivated: `curl -X POST http://localhost:8001/chaos/deactivate`
 - [ ] Generate 10 min of baseline traffic before recording so dashboards show a calm "before" state:
@@ -25,7 +27,8 @@ Run through this list top to bottom. Do not start recording until every box chec
   2. SigNoz → **Burnrate — Live Cost Monitor** dashboard (time range: last 30 min)
   3. SigNoz → **Burnrate — Cost by Agent & Task** dashboard
   4. SigNoz → Traces (filtered to `service.name = burnrate-demo-app`)
-  5. GitHub repo README
+  5. SigNoz → Logs (filtered to `service.name IN (burnrate-demo-app, burnrate-cost-guard)`)
+  6. GitHub repo README
 - [ ] Terminal 1: cost-guard log tail visible: `tail -f /tmp/cost-guard.log`
 - [ ] Terminal 2: prompt ready for chaos commands
 - [ ] Screen recorder set to capture full screen at 1080p+; microphone tested
@@ -173,14 +176,18 @@ back toward baseline after the throttle.
 2. SigNoz Traces → click into one `gen_ai chat` span → attributes panel showing
    `gen_ai.usage.cost.total`, `gen_ai.usage.cost.input`, `gen_ai.usage.cost.output`
    alongside the token counts
+3. SigNoz Logs → filtered to both services — demo-app's retry warnings and
+   Cost Guard's `ACTION: throttled` line in one stream
 
 **Narration:**
 
 > "Everything is queryable after the fact. Cost by agent, by task, by model.
 > And here, on the individual trace: `gen_ai.usage.cost.total`, right next to
 > the token counts it was derived from. You can filter traces by cost. Sort by
-> cost. Alert on cost. This is what the OTel spec should have had from the
-> start."
+> cost. Alert on cost. And the whole incident narrative — the retries, the
+> diagnosis, the throttle — lives in SigNoz Logs, correlated with those same
+> traces. Traces, metrics, and logs, one pipeline. This is what the OTel spec
+> should have had from the start."
 
 ---
 
@@ -251,8 +258,10 @@ you up on the narration.
 
 ## Troubleshooting
 
-- **Alert never reaches Cost Guard** — webhook URL must be
-  `http://host.docker.internal:8082/alert`, not `localhost` (SigNoz runs in Docker).
+- **Alert never reaches Cost Guard (local dev mode)** — SigNoz runs in Docker, cost-guard
+  on the host. Webhook URL must be `http://host.docker.internal:8082/alert`, not `localhost`.
+- **Alert never reaches Cost Guard (Docker Compose mode)** — both services are on `signoz-network`.
+  Use `http://burnrate-cost-guard:8082/alert`.
 - **Dashboard lines flat at 0** — Rate aggregation needs live traffic; make sure
   the baseline-traffic loop from the checklist is still running.
 - **Port 8082 already in use** — a stale Cost Guard instance: `pkill -f "guard.webhook"`, restart.

@@ -82,6 +82,7 @@ Then open **http://localhost:8080** and watch:
 - **SigNoz Metrics** → `burnrate.cost.usd` climbs in real time
 - **Alert fires** → BurnRateBudgetAlert triggered
 - **Cost Guard logs** → Investigates via SigNoz MCP, diagnoses, throttles
+- **SigNoz Logs** → chaos warnings from `burnrate-demo-app` and the incident narrative from `burnrate-cost-guard`, correlated with traces
 - **Cost recovers** → researcher-v1 throttled, spend drops to baseline
 
 ### 6. Restore and reset
@@ -186,7 +187,7 @@ Docker Desktop users: set **Memory ≥ 4GB** in Preferences → Resources.
 |------|---------|---------|
 | **8080** | SigNoz UI | Dashboards, alerts, queries |
 | **8000** | SigNoz MCP | Cost Guard investigations via AI tools |
-| **4317** | SigNoz ingester | OTLP gRPC (demo-app sends spans here) |
+| **4317** | SigNoz ingester | OTLP gRPC (traces, metrics, and logs from both services) |
 | **4318** | SigNoz ingester | OTLP HTTP (alternative) |
 | **8001** | Demo App | Chaos injection, batch research endpoints |
 | **8082** | Cost Guard | Webhook listener for SigNoz alerts |
@@ -274,9 +275,9 @@ curl -X POST http://localhost:8001/control/restore
 ### First-Time Setup
 
 1. **Import dashboards** — Go to http://localhost:8080 → Dashboards → Import JSON:
-   - `dashboards/burnrate-live-cost-monitor.json`
-   - `dashboards/burnrate-cost-by-agent.json`
-   - `dashboards/burnrate-model-efficiency.json`
+   - `dashboards/burn-rate-live.json`
+   - `dashboards/cost-by-agent.json`
+   - `dashboards/model-efficiency.json`
 
 2. **Create the alert rule:**
    - Go to Alerts → Create Alert Rule
@@ -297,6 +298,17 @@ curl -X POST http://localhost:8001/control/restore
 | `gen_ai.usage.input_tokens` | Input token count |
 | `gen_ai.usage.output_tokens` | Output token count |
 | `gen_ai.usage.cache_read_input_tokens` | Cache hit tokens (savings) |
+
+### Logs to Watch
+
+Both services export logs to SigNoz over OTLP (**Logs** tab in the UI):
+
+| `service.name` | What You'll See |
+|--------|------------------|
+| `burnrate-demo-app` | Chaos activations, simulated RateLimit retries, throttle/restore events — with trace context for pivot-to-trace |
+| `burnrate-cost-guard` | The incident narrative: alert received → diagnosis → actions taken |
+
+Filter: `service.name IN (burnrate-demo-app, burnrate-cost-guard)`
 
 ---
 

@@ -990,7 +990,7 @@
   }
   .sz-chips {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     gap: 1.25rem;
     margin-top: 2.5rem;
   }
@@ -1557,6 +1557,7 @@ provider.add_span_processor(
       <ul class="sz-points">
         <li><strong>Traces</strong> — every gen_ai span enriched with cost, queryable in SigNoz trace explorer</li>
         <li><strong>Metrics</strong> — burnrate.cost.usd charted per agent, model, and service in real time</li>
+        <li><strong>Logs</strong> — chaos warnings and Cost Guard's incident narrative, shipped over OTLP with trace context</li>
         <li><strong>Alerts</strong> — BurnRateBudgetAlert watches real dollars, not proxy metrics</li>
         <li><strong>MCP server</strong> — Cost Guard's investigation tool: queries traces, metrics, and logs autonomously</li>
       </ul>
@@ -1793,6 +1794,10 @@ provider.add_span_processor(<span class="fn">BurnrateSpanProcessor</span>())
       <div class="sz-chip">
         <h3>Alerts</h3>
         <p>BurnRateBudgetAlert watches real dollars, not proxy metrics. The threshold you just tuned is a SigNoz alert rule.</p>
+      </div>
+      <div class="sz-chip">
+        <h3>Logs</h3>
+        <p>Chaos warnings from the agents and Cost Guard's alert-to-throttle narrative, shipped over OTLP with trace context.</p>
       </div>
       <div class="sz-chip">
         <h3>MCP Server</h3>

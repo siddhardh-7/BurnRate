@@ -52,6 +52,8 @@ A zero-config OpenTelemetry SpanProcessor that enriches every GenAI span with re
 
 **3. Autonomous cost defense** — Cost Guard wakes on a SigNoz alert, investigates via the SigNoz MCP server, throttles the culprit agent, and files an incident report — all without a human on-call.
 
+**4. Correlated logs** — every chaos activation, retry warning, and Cost Guard action ships to SigNoz Logs over OTLP with trace context attached. All three telemetry pillars — traces, metrics, logs — from one integration.
+
 ---
 
 ## Architecture
@@ -72,7 +74,7 @@ A zero-config OpenTelemetry SpanProcessor that enriches every GenAI span with re
                                    ▼
               ┌─────────────────────────────────────────┐
               │              SigNoz                     │
-              │  Traces  ·  Metrics  ·  Alerts          │
+              │  Traces · Metrics · Logs · Alerts       │
               │  3 importable dashboards                │
               │  Budget alert rule                      │
               └───────────────────┬─────────────────────┘
@@ -225,6 +227,8 @@ When a budget alert fires:
 4. **Diagnoses** — root cause, culprit agent, culprit operation, evidence, estimated hourly cost
 5. **Acts** — throttles the culprit via the demo app's control API; burn rate drops within 60 seconds
 6. **Reports** — structured incident report to Slack (or stdout if no webhook configured)
+
+Every step is also logged to SigNoz over OTLP (`service.name = burnrate-cost-guard`) — the alert-to-throttle narrative is queryable in the Logs view after the incident.
 
 ### Sample incident report
 
@@ -392,8 +396,8 @@ burnrate/
 |---|---|---|
 | SigNoz UI | 8080 | Dashboards · traces · alert rules |
 | SigNoz MCP | 8000 | AI tool access (`/mcp`) for Cost Guard |
-| OTLP gRPC | 4317 | Trace + metric ingestion |
-| OTLP HTTP | 4318 | Trace + metric ingestion (alternative) |
+| OTLP gRPC | 4317 | Trace · metric · log ingestion |
+| OTLP HTTP | 4318 | Trace · metric · log ingestion (alternative) |
 | Demo App | 8001 | Research pipeline + chaos control |
 | Cost Guard | 8082 | SigNoz alert webhook receiver |
 
