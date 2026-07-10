@@ -279,15 +279,15 @@ film is real.
 
 ## Voiceover — ElevenLabs
 
-1. Free account (script total ≈ 2.6k chars, well within the 10k free tier).
-2. Voice **Brian** (or Adam/Daniel). Model: Multilingual v2.
-3. Stability **50%**, Similarity **75%**, Style **0%**, Speaker Boost on.
-4. Generate all 8 blocks in one sitting → `vo-cold.mp3`, `vo-act1.mp3`,
-   `vo-act2.mp3`, `vo-act3.mp3`, `vo-act4a.mp3`, `vo-act4b.mp3`,
-   `vo-act5.mp3`, `vo-close.mp3`.
-5. The cold open wants a slower, quieter read — if it comes out too bright,
-   add `...` between its sentences and regenerate. If "SigNoz" mispronounces,
-   write "Sig-noze".
+Use the **paste-ready tagged blocks in [`docs/vo-elevenlabs.md`](vo-elevenlabs.md)** —
+they carry the delivery direction ([whispers], [pause], [emphasized], CAPS
+stress) inline.
+
+1. Free account (script total ≈ 2.8k chars, well within the 10k free tier).
+2. Model **Eleven v3** (required — the audio tags only work there).
+   Voice **Brian**. Stability **Natural**.
+3. Generate all 8 blocks in one sitting → `vo-cold.mp3` … `vo-close.mp3`.
+4. If "SigNoz" mispronounces, write "Sig-noze" and regenerate.
 
 ## Assembly — iMovie
 
