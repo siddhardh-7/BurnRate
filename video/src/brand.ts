@@ -17,9 +17,9 @@ export const FONT =
   '-apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif';
 
 export const CHAPTERS = [
-  { index: "01", title: "The Gap" },
+  { index: "01", title: "The Blind Spot" },
   { index: "02", title: "One Line" },
-  { index: "03", title: "Inject Chaos" },
-  { index: "04", title: "Cost Guard" },
-  { index: "05", title: "The Evidence" },
+  { index: "03", title: "The Incident" },
+  { index: "04", title: "The Machine Wakes" },
+  { index: "05", title: "The Morning After" },
 ];

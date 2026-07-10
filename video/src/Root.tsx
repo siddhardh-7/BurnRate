@@ -1,6 +1,7 @@
 import React from "react";
 import { Composition } from "remotion";
 import { ChapterCard } from "./ChapterCard";
+import { ColdOpen } from "./ColdOpen";
 import { Intro } from "./Intro";
 import { Outro } from "./Outro";
 
@@ -11,6 +12,14 @@ const CARD_FRAMES = 36; // 1.2s
 
 export const Root: React.FC = () => (
   <>
+    <Composition
+      id="ColdOpen"
+      component={ColdOpen}
+      durationInFrames={420}
+      fps={FPS}
+      width={W}
+      height={H}
+    />
     <Composition
       id="Intro"
       component={Intro}

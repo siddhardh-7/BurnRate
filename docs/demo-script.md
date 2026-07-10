@@ -1,135 +1,170 @@
-# Burnrate — Demo Video Production Script
+# Burnrate — Demo Film: "3:04 AM"
 
-A complete production plan for the 3-minute submission video: shot list, TTS-ready
-voiceover, animated graphics, and assembly guide. Every number and log line shown
-on screen matches what the system actually produces in mock mode — no aspirational
-output.
+Not a product walkthrough — a three-minute story with the real system as its
+spine. The viewer *feels* the incident before they understand the product; by
+the time the report scrolls, they're not evaluating a tool, they're watching a
+night they've lived get fixed. Every number and log line on screen matches what
+the system actually produces in mock mode.
 
-**Pipeline:** record clips (QuickTime) → generate voiceover (ElevenLabs) → render
-brand cards (Remotion, in `video/`) → assemble (iMovie).
-
----
-
-## Timeline at a Glance
-
-| # | Clip | Type | Duration | Ends at |
-|---|------|------|---------:|--------:|
-| 0 | Intro card | Remotion `Intro` | 5.0s | 0:05 |
-| 1 | Chapter 01 card — THE GAP | Remotion `Card01` | 1.2s | 0:06 |
-| 2 | The spec gap | Screen + VO | 18s | 0:24 |
-| 3 | Chapter 02 card — ONE LINE | Remotion `Card02` | 1.2s | 0:26 |
-| 4 | One-line integration | Screen + VO | 20s | 0:46 |
-| 5 | Chapter 03 card — INJECT CHAOS | Remotion `Card03` | 1.2s | 0:47 |
-| 6 | Chaos injection + spike | Screen + VO | 22s | 1:09 |
-| 7 | Chapter 04 card — COST GUARD | Remotion `Card04` | 1.2s | 1:10 |
-| 8 | Cost Guard activates | Screen + VO | 30s | 1:40 |
-| 9 | The incident report | Screen + VO | 30s | 2:10 |
-| 10 | Chapter 05 card — THE EVIDENCE | Remotion `Card05` | 1.2s | 2:12 |
-| 11 | Evidence trail | Screen + VO | 24s | 2:36 |
-| 12 | Close | Screen + VO | 16s | 2:52 |
-| 13 | Outro card | Remotion `Outro` | 7.0s | 2:59 |
-
-Running long? Cut in this order: chapter cards 03–05, then trim clip 11 to 18s.
+**Pipeline:** render story graphics (Remotion, `video/`) → generate voiceover
+(ElevenLabs) → record real-system clips (QuickTime) → optional AI stills
+(prompts below) → assemble (iMovie).
 
 ---
 
-## Recording Hygiene (do these before any capture)
+## The Narrative Design (why each beat exists)
 
-- **Clean the frame**: hide desktop icons (`defaults write com.apple.finder CreateDesktop false; killall Finder` — revert with `true` after), hide the Dock (⌥⌘D), hide browser bookmarks bar (⇧⌘B), close every unrelated tab.
-- **Do Not Disturb on** — one Slack ping ruins a take.
-- **Browser zoom 110%** for SigNoz so panel text is legible at 1080p.
-- **Terminal**: dark theme, font ≥16pt, window ~120×30. Clear scrollback before each take (`⌘K`).
-- **Cursor**: move deliberately, point at what the VO mentions, never circle-scrub.
-- QuickTime → File → New Screen Recording → record **full screen**. iMovie will downscale retina to 1080p on export.
-- Record each clip as its **own file**, named `clip-02-gap.mov`, `clip-04-oneline.mov`, etc. Segment recording kills the alert-wait dead air and makes retakes cheap.
+| Beat | Device | Effect on the viewer |
+|------|--------|----------------------|
+| Cold open: a counter burning in the dark | **Loss aversion** — money visibly leaving, before any explanation | Visceral stake in the first 10 seconds |
+| "It isn't your fault. It's the spec." | **Absolution** | Removes defensiveness; viewer joins your side |
+| "One line" | **Effort collapse** — huge problem, tiny fix | The relief beat; makes the solution memorable |
+| Re-creating the incident live | **Reenactment** | Turns a demo into a plot: we return to the scene of the crime, armed |
+| "No human touched anything" | **Autonomy reveal** | The wow beat — the machine handles the 3 AM that opened the film |
+| $263.52/day, 9.3×, 1,387 tokens | **Specificity** | Precise numbers read as truth; round numbers read as marketing |
+| "The next 3:04 AM…" callback | **Narrative closure** | The open loop from second one gets closed in the final line |
 
 ---
+
+## Timeline
+
+| # | Clip | Source | Duration | Ends at |
+|---|------|--------|---------:|--------:|
+| 0 | Cold open — the burn counter | Remotion `coldopen.mp4` (+ optional AI stills intercut) | 14s | 0:14 |
+| 1 | Title card | Remotion `intro.mp4` | 5s | 0:19 |
+| 2 | Card 01 — THE BLIND SPOT | Remotion `card01.mp4` | 1.2s | 0:20 |
+| 3 | Act 1: the spec gap | Screen + VO | 16s | 0:36 |
+| 4 | Card 02 — ONE LINE | Remotion `card02.mp4` | 1.2s | 0:37 |
+| 5 | Act 2: the fix | Screen + VO | 18s | 0:55 |
+| 6 | Card 03 — THE INCIDENT | Remotion `card03.mp4` | 1.2s | 0:56 |
+| 7 | Act 3: reenactment | Screen + VO | 22s | 1:18 |
+| 8 | Card 04 — THE MACHINE WAKES | Remotion `card04.mp4` | 1.2s | 1:19 |
+| 9 | Act 4a: Cost Guard log | Screen + VO | 24s | 1:43 |
+| 10 | Act 4b: the incident report | Screen + VO | 26s | 2:09 |
+| 11 | Card 05 — THE MORNING AFTER | Remotion `card05.mp4` | 1.2s | 2:10 |
+| 12 | Act 5: the evidence | Screen + VO | 22s | 2:32 |
+| 13 | Close: open source + upstream | Screen + VO | 16s | 2:48 |
+| 14 | Outro card | Remotion `outro.mp4` | 7s | 2:55 |
+
+Running long? Trim Act 5 to 16s, then drop cards 03–05.
+
+---
+
+## Music & Sound Design
+
+Story needs a score arc, not one flat bed. All from Pixabay Music (free, no
+attribution) — search terms given:
+
+- **0:00–0:19** — low tension pulse ("dark ambient pulse"). Starts almost
+  inaudible, swells with the counter.
+- **0:19–0:56** — cut to near-silence under Act 1 (the gap lands harder in
+  quiet), then a minimal warm bed enters with "One line" ("minimal technology
+  ambient").
+- **0:56–1:43** — tension returns for the incident ("suspense electronic
+  minimal"), releases the moment `ACTION: throttled` appears.
+- **1:43–2:55** — resolve to the warm bed again, slight lift for the outro.
+- Keep music at ~10–12%, and apply iMovie's "Lower volume of other clips"
+  (ducking) on every VO segment.
+
+---
+
+## Recording Hygiene
+
+- Hide desktop icons (`defaults write com.apple.finder CreateDesktop false; killall Finder` — revert with `true` after), hide the Dock (⌥⌘D), hide bookmarks bar (⇧⌘B), close unrelated tabs.
+- Do Not Disturb **on**. Browser zoom **110%** for SigNoz. Terminal: dark theme, ≥16pt, ~120×30, `⌘K` before every take.
+- Cursor moves deliberately; point at what the VO names; never circle-scrub.
+- QuickTime → New Screen Recording → full screen. Record each clip as its own
+  file: `act1-spec.mov`, `act2-oneline.mov`, `act3-chaos.mov`, `act4a-log.mov`,
+  `act4b-report.mov`, `act5-evidence.mov`, `close.mov`.
 
 ## Pre-Flight Checklist
 
-This assumes **local dev mode** (SigNoz via `foundryctl cast`; demo-app and Cost
-Guard via `uv run` on the host). For Docker Compose mode, substitute
-`docker logs -f burnrate-cost-guard` for the log tail and
-`http://burnrate-cost-guard:8082/alert` as the webhook URL.
+Local dev mode assumed (SigNoz via `foundryctl cast`; demo-app and Cost Guard
+via `uv run`). Docker Compose mode: use `docker logs -f burnrate-cost-guard`
+for the tail and `http://burnrate-cost-guard:8082/alert` as the webhook.
 
-- [ ] SigNoz running (UI on `http://localhost:8080`) — start with `foundryctl cast` if not already up
-- [ ] Demo app running: `cd demo-app && uv run python -m demo.app` (port 8001)
-- [ ] Cost Guard running: `cd cost-guard && uv run python -m guard.webhook 2>&1 | tee /tmp/cost-guard.log` (port 8082)
-- [ ] Webhook test: notification channel is `http://host.docker.internal:8082/alert` — send a test notification, confirm 200 in the Cost Guard log
-- [ ] No leftover throttles: `curl -X POST http://localhost:8001/control/restore`
-- [ ] Chaos deactivated: `curl -X POST http://localhost:8001/chaos/deactivate`
-- [ ] Baseline traffic running for 10+ min so dashboards show a calm "before":
+- [ ] SigNoz UI up on `http://localhost:8080` (`foundryctl cast` if not)
+- [ ] Demo app: `cd demo-app && uv run python -m demo.app`
+- [ ] Cost Guard: `cd cost-guard && uv run python -m guard.webhook 2>&1 | tee /tmp/cost-guard.log`
+- [ ] Webhook test → 200 in the Cost Guard log (channel: `http://host.docker.internal:8082/alert`)
+- [ ] `curl -X POST http://localhost:8001/control/restore` and `curl -X POST http://localhost:8001/chaos/deactivate`
+- [ ] Baseline traffic for 10+ min before recording:
   ```bash
   while true; do curl -s -X POST "http://localhost:8001/research/batch?count=2" > /dev/null; sleep 45; done
   ```
-- [ ] Browser tabs open, in order:
-  1. OTel GenAI spec — `opentelemetry.io/docs/specs/semconv/gen-ai/gen-ai-spans/` scrolled to the `gen_ai.usage.*` table
-  2. SigNoz → **Burnrate — Live Cost Monitor** (time range: last 30 min)
-  3. SigNoz → **Burnrate — Cost by Agent & Task**
-  4. SigNoz → Traces (filtered to `service.name = burnrate-demo-app`)
-  5. SigNoz → Logs (filtered to `service.name IN (burnrate-demo-app, burnrate-cost-guard)`)
-  6. GitHub repo README
-  7. `https://siddhardh-7.github.io/BurnRate/` (the website)
-- [ ] Terminal 1: `tail -f /tmp/cost-guard.log`
-- [ ] Terminal 2: prompt ready for chaos commands
-- [ ] Do one full dry run end-to-end before recording — it flushes stale metrics, confirms the alert threshold, and warms up the flow.
+- [ ] Tabs in order: OTel GenAI spec (`gen_ai.usage.*` table) · Live Cost Monitor · Cost by Agent & Task · Traces (`service.name = burnrate-demo-app`) · Logs (both services) · GitHub README · the website
+- [ ] Terminal 1: `tail -f /tmp/cost-guard.log` · Terminal 2: ready for chaos commands
+- [ ] One full dry run end-to-end before the real takes
 
 ---
 
-## Clips
+## The Film
 
-Each clip has **SCREEN** (what you record) and **VO** (the exact text to paste
-into ElevenLabs — one audio file per clip, named `vo-02.mp3` etc.). Word counts
-are tuned to the clip duration at documentary narration pace; if an audio file
-runs ±2s, stretch or trim the screen footage, never the audio.
+VO blocks are TTS-ready — paste each into ElevenLabs as-is (drop the `>` marks).
+One MP3 per block: `vo-cold.mp3`, `vo-act1.mp3` … `vo-close.mp3`.
 
-### Clip 2 — The Spec Gap (18s · VO ≈ 44 words)
+### 0 — Cold Open (14s · Remotion `coldopen.mp4` · VO ≈ 33 words)
 
-**SCREEN:** OTel GenAI spec page. Slow, single scroll that brings the
-`gen_ai.usage.*` token attributes table into center frame. Hold on the table for
-the last 5 seconds. No clicking.
+**SCREEN:** The rendered cold open: a dark frame, `03:04 AM` in the corner, a
+dollar counter creeping from $0.47 and accelerating toward $847, an orange burn
+line climbing across the dark. Hard cut to black on the final beat.
+
+**Optional AI stills** (see prompts below): intercut two 2-second Ken Burns
+cutaways — the sleeping engineer at ~0:04, the glowing phone at ~0:09. The
+counter stays the anchor; the stills are texture.
+
+**VO** *(slow, quiet, close to the mic — this is a bedtime story going wrong)*:
+> Three-oh-four in the morning. Nobody is watching. An AI agent hits an error…
+> and retries. And retries. Your observability stack sees every token it burns.
+> It just can't see the money.
+
+### 1 — Title Card (5s · `intro.mp4` · no VO)
+
+Music swells one notch. The burn line from the cold open becomes the logo's
+line — same shape, now under control.
+
+### Act 1 — The Blind Spot (16s · VO ≈ 39 words)
+
+**SCREEN:** OTel GenAI spec page. One slow scroll bringing the `gen_ai.usage.*`
+token table center-frame; hold the last 4 seconds.
 
 **VO:**
-> The OpenTelemetry GenAI spec tracks everything about your AI agents. Every input
-> token. Every output token. Cache hits. Reasoning tokens. Everything — except a
-> single dollar. So when an agent runs wild at 3 AM, your dashboards show tokens
-> burned. Not money lost.
+> This blind spot isn't your team's fault. It's written into the specification.
+> The OpenTelemetry GenAI conventions define every token counter you could ask
+> for. Input. Output. Cache. Reasoning. The word "cost" appears nowhere.
 
-### Clip 4 — One Line (20s · VO ≈ 49 words)
+### Act 2 — One Line (18s · VO ≈ 44 words)
 
-**SCREEN:** Two shots, cut in iMovie. (a) ~7s: the README quickstart snippet —
-zoom browser to 150% so this line fills the frame:
-`provider.add_span_processor(BurnrateSpanProcessor())`. (b) ~13s: SigNoz
-**Live Cost Monitor**, calm baseline lines for researcher-v1 and summarizer-v1.
+**SCREEN:** (a) ~7s: README quickstart at 150% zoom —
+`provider.add_span_processor(BurnrateSpanProcessor())` fills the frame.
+(b) ~11s: Live Cost Monitor, two calm baseline lines.
 
 **VO:**
-> This is Burnrate. One line added to our agent pipeline, and SigNoz now sees real
-> dollar costs. Every span carries its exact cost in dollars. Every agent's spend
-> streams into live metrics, broken down by agent and by model. Two agents, steady
-> traffic, fractions of a cent per minute. Normal.
+> The fix starts embarrassingly small. One line, added to the pipeline. Now
+> every span carries its exact cost in dollars, and every agent's spend streams
+> into SigNoz in real time. Two agents. Steady traffic. Fractions of a cent per
+> minute.
 
-### Clip 6 — Inject Chaos (22s · VO ≈ 54 words)
+### Act 3 — The Incident, Recreated (22s · VO ≈ 52 words)
 
-**SCREEN:** (a) ~8s: Terminal 2, type these live — don't paste:
+**SCREEN:** (a) ~8s: Terminal 2, typed live:
 ```bash
 curl -X POST http://localhost:8001/chaos/activate/retry_loop
 curl -s -X POST "http://localhost:8001/research/batch?count=5"
 ```
-(b) ~14s: cut to **Live Cost Monitor**. The researcher-v1 line spikes;
-summarizer-v1 stays flat. Hold the spike.
+(b) ~14s: Live Cost Monitor — researcher-v1 goes vertical, summarizer-v1 flat.
+Hold the spike.
 
 **VO:**
-> Let's plant tonight's three-A-M bug. The researcher agent now has a broken error
-> handler — every call retries eight to twelve times, dragging its accumulated
-> context back in each attempt. Watch the burn rate. There it is. Nine times
-> baseline, and climbing. The summarizer, same service, stays flat. This chart
-> shows you who is spending your money.
+> So let's go back to that night — this time with Burnrate watching. We plant
+> the same bug: a broken error handler, every call retrying eight to twelve
+> times. There it is. Nine times baseline and climbing. And the chart already
+> knows exactly who is spending the money.
 
-### Clip 8 — Cost Guard Activates (30s · VO ≈ 73 words)
+### Act 4a — The Machine Wakes (24s · VO ≈ 57 words)
 
 **SCREEN:** Terminal 1, the Cost Guard log tail. The alert fires on its own
-(rule evaluates every minute; expect up to ~90s after the spike — this is why you
-record in segments). What actually appears:
+(up to ~90s after the spike — record this clip after it lands):
 
 ```
 INFO  Alert received: BurnRateBudgetAlert status=firing
@@ -140,20 +175,19 @@ INFO  ACTION: throttled agent=researcher-v1 to 2 calls/min
 ```
 
 **VO:**
-> No human touched anything. The SigNoz budget alert fired, and Cost Guard woke up.
-> It investigates through SigNoz's own MCP server — the official one — querying
-> cost metrics to find the top spender, pulling traces to confirm the retry
-> pattern, checking token counts for the blast radius. Diagnosis: researcher
-> version one, high confidence. Then it acts. The culprit is throttled to two
-> calls a minute. Live. Automatically.
+> This time, no one gets paged. The budget alert fires, and Cost Guard wakes
+> instead. It investigates through SigNoz's own MCP server — querying cost
+> metrics for the top spender, pulling traces to confirm the retry pattern.
+> Diagnosis: researcher, high confidence. Then it acts. Throttled to two calls
+> a minute. No human touched anything.
 
-*(If recording in real-LLM mode, `[SigNoz MCP] calling tool:` lines appear here —
-keep them in frame, they're the best part.)*
+*(Real-LLM mode adds `[SigNoz MCP] calling tool:` lines here — keep them in
+frame if you have credits; see Real-Mode Insert.)*
 
-### Clip 9 — The Incident Report (30s · VO ≈ 71 words)
+### Act 4b — The Report (26s · VO ≈ 61 words)
 
-**SCREEN:** The report in the Cost Guard terminal (or Slack if configured).
-Scroll it slowly, top to bottom — this is the money shot:
+**SCREEN:** The incident report, scrolled slowly — the money shot. End on a
+~4s cut back to Live Cost Monitor: the spike falling.
 
 ```
 🔥 BurnRateBudgetAlert — CRITICAL
@@ -173,102 +207,102 @@ Actions taken by Cost Guard:
   ✓ Throttled researcher-v1 to 2 calls/min — burn rate will drop within 60s
 ```
 
-End the clip by cutting back to **Live Cost Monitor** for ~4s: the researcher-v1
-line falling back toward baseline.
-
 **VO:**
 > Thirty seconds after the alert: a full incident report. Root cause. Evidence
-> pulled from SigNoz. Dollar impact — two hundred sixty-three dollars a day,
-> projected, from one bug. Found and stopped with no dashboards opened and no
-> traces hunted by hand. And this is demo scale — swap in a production workload
-> and that same bug is a four-thousand-dollar morning. And there's the throttle
-> landing. Burn rate's already coming down.
+> pulled from SigNoz. And the number that matters — two hundred sixty-three
+> dollars a day, projected, from one bug. At demo scale. Swap in a production
+> workload, and this is a four-thousand-dollar morning that never happens. And
+> there — the throttle lands. The burn is already dying.
 
-### Clip 11 — The Evidence Trail (24s · VO ≈ 58 words)
+### Act 5 — The Morning After (22s · VO ≈ 51 words)
 
-**SCREEN:** Three shots, ~8s each:
-1. **Cost by Agent & Task** — the "Top Agents by Total Spend" table, researcher-v1 dwarfing summarizer-v1
-2. Traces → open one `gen_ai chat` span → attributes panel showing `gen_ai.usage.cost.total` / `.input` / `.output` beside the token counts
-3. Logs → both services in one stream — demo-app's retry warnings and Cost Guard's `ACTION: throttled` line
-
-**VO:**
-> Everything stays queryable. Cost by agent, by task, by model. On the individual
-> trace, the dollar cost sits right next to the token counts it was derived from —
-> filter by it, sort by it, alert on it. And the whole incident narrative lives in
-> SigNoz Logs, correlated with those same traces. Traces, metrics, and logs. One
-> pipeline.
-
-### Clip 12 — Close (16s · VO ≈ 40 words)
-
-**SCREEN:** (a) ~8s: the website hero (`siddhardh-7.github.io/BurnRate`) — slow
-scroll to the three deliverable cards. (b) ~8s: GitHub README at the semconv
-proposal section.
+**SCREEN:** Three shots, ~7s each: (1) Cost by Agent & Task — the spend table,
+researcher-v1 dwarfing summarizer-v1. (2) One `gen_ai chat` span open —
+`gen_ai.usage.cost.total` beside the token counts. (3) Logs — both services in
+one stream, demo-app's retry warnings above Cost Guard's `ACTION: throttled`.
 
 **VO:**
-> Burnrate is open source, Apache two. One pip-installable package — add one line,
-> point OTLP at SigNoz, done. And because the real fix belongs upstream, the repo
-> ships a formal proposal to add cost attributes to the OpenTelemetry spec itself.
+> By morning, this isn't a war story — it's a queryable incident. Cost by
+> agent, by task, by model. The dollar amount sits on the trace, next to the
+> tokens it came from. And the whole night — retries, diagnosis, throttle —
+> lives in SigNoz Logs. Traces, metrics, logs. One pipeline.
 
-*(The outro card carries the closing tagline visually — no VO over it, just music.)*
+### Close (16s · VO ≈ 40 words)
+
+**SCREEN:** (a) ~8s: the website hero, slow scroll to the deliverable cards.
+(b) ~8s: GitHub README at the semconv proposal section.
+
+**VO:**
+> Burnrate is open source — one package, one line, pointed at SigNoz. And
+> because the real fix belongs upstream, the repo ships a formal proposal to
+> put cost into the OpenTelemetry spec itself. So the next three-oh-four AM…
+> belongs to the machine.
+
+### Outro (7s · `outro.mp4` · no VO)
+
+"Token counts don't pay the bill. **Dollars do.**" Music resolves. Done.
 
 ---
 
 ## Graphics — Remotion (`video/`)
 
-The animated cards live in `video/` as a Remotion project (brand-matched: the
-logo line-draw animation, chapter cards, outro). Render them yourself:
-
 ```bash
 cd video
-npm install
-npm run render        # renders all 7 cards to video/out/*.mp4
+npm install        # first time only
+npm run render     # renders all 8 pieces to video/out/
 ```
 
-> Remotion downloads its own headless browser on first render — it does not
-> touch your Chrome.
+Outputs: `coldopen.mp4`, `intro.mp4`, `card01–05.mp4`, `outro.mp4` — 1080p/30fps.
+(Remotion uses its own headless browser; it never touches your Chrome.)
 
-Outputs: `intro.mp4`, `card01.mp4` … `card05.mp4`, `outro.mp4` — 1920×1080, 30fps,
-drop straight into iMovie.
+## Optional AI Stills (cold-open texture)
 
----
+Generate at 16:9 in Midjourney / DALL·E / Ideogram; use as 2s Ken Burns
+cutaways inside the cold open. Skip these entirely if they look off — the
+Remotion counter carries the open on its own.
+
+**Still 1 — the sleeping engineer:**
+> Cinematic photograph, a software engineer asleep at a home-office desk at
+> night, face lit only by two dim monitors showing charts, dark room, moody
+> teal and deep-orange color grade, shallow depth of field, shot on 35mm film,
+> no text, no logos, 16:9.
+
+**Still 2 — the phone that isn't ringing:**
+> Cinematic close-up photograph, a smartphone face-up on a nightstand in a dark
+> bedroom, screen off, faint orange light reflecting on it from a window, heavy
+> shadows, quiet dread mood, teal-and-orange grade, shallow depth of field, no
+> text, 16:9.
+
+Rules: reject any output with garbled text or extra limbs; regenerate. Never
+use AI imagery for product shots — every dashboard, log, and report in this
+film is real.
 
 ## Voiceover — ElevenLabs
 
-1. Create a free account at elevenlabs.io (free tier ≈ 10k chars/month; this
-   script uses ~2.5k).
-2. Voice: **Brian** or **Adam** (calm, documentary). Model: Multilingual v2.
-3. Settings: Stability **50%**, Similarity **75%**, Style **0%**, Speaker boost on.
-4. Paste each clip's VO block (just the text, not the `>` marks) → generate →
-   download as `vo-02.mp3`, `vo-04.mp3`, `vo-06.mp3`, `vo-08.mp3`, `vo-09.mp3`,
-   `vo-11.mp3`, `vo-12.mp3`.
-5. Listen once for mispronunciations. If "SigNoz" comes out wrong, spell it
-   "Sig-noze" in the text and regenerate.
-
----
+1. Free account (script total ≈ 2.6k chars, well within the 10k free tier).
+2. Voice **Brian** (or Adam/Daniel). Model: Multilingual v2.
+3. Stability **50%**, Similarity **75%**, Style **0%**, Speaker Boost on.
+4. Generate all 8 blocks in one sitting → `vo-cold.mp3`, `vo-act1.mp3`,
+   `vo-act2.mp3`, `vo-act3.mp3`, `vo-act4a.mp3`, `vo-act4b.mp3`,
+   `vo-act5.mp3`, `vo-close.mp3`.
+5. The cold open wants a slower, quieter read — if it comes out too bright,
+   add `...` between its sentences and regenerate. If "SigNoz" mispronounces,
+   write "Sig-noze".
 
 ## Assembly — iMovie
 
-1. New Movie → import all `clip-*.mov`, `vo-*.mp3`, and `video/out/*.mp4`.
-2. Lay the timeline in the Timeline-at-a-Glance order: `intro.mp4`, `card01.mp4`,
-   `clip-02-gap.mov`, `card02.mp4`, …, `outro.mp4`.
-3. Drag each `vo-*.mp3` under its screen clip; align the audio start with the
-   clip start; trim/extend the video to the narration.
-4. Transitions: **none** between cards and clips (hard cuts read as confident).
-   One exception: 0.5s cross-dissolve from clip 9's report into the dashboard
-   recovery shot.
-5. Music (optional but recommended): one low ambient tech track under the whole
-   video (Pixabay Music → search "technology ambient" — free, no attribution).
-   Volume ~12%, and use iMovie's "Lower volume of other clips" (ducking) on every
-   VO segment.
-6. Export: File → Share → File → 1080p, High quality, Faster compress off.
-7. Watch the export start-to-finish once at full volume before submitting.
+1. Import everything; lay the timeline in the Timeline-table order.
+2. VO under each clip, aligned to clip start; stretch/trim video to narration —
+   never the audio.
+3. Hard cuts everywhere except: a 0.5s cross-dissolve from the report into the
+   recovery shot, and the cold open's final cut-to-black → title card (butt
+   them directly; the rendered blackout is the transition).
+4. Music per the sound-design arc above, ducked under all VO.
+5. Export 1080p high quality. Watch the full export at volume before submitting.
 
----
+## Backup Plan
 
-## Backup Plan (if live chaos misbehaves on camera)
-
-The E2E loop can be triggered manually without waiting for SigNoz's evaluator —
-the Cost Guard output is identical:
+Trigger the loop manually if the live alert misbehaves — output is identical:
 
 ```bash
 curl -X POST http://localhost:8082/alert -H 'Content-Type: application/json' -d '{
@@ -281,23 +315,21 @@ curl -X POST http://localhost:8082/alert -H 'Content-Type: application/json' -d 
 }'
 ```
 
-Keep one screen recording of a successful full loop as splice-in insurance.
+Keep one recording of a full successful loop as splice-in insurance.
 
-## Optional Real-Mode Insert
+## Real-Mode Insert
 
-If Anthropic credits are added before recording: set `COST_GUARD_MOCK=false` in
-`.env`, restart Cost Guard, and re-record **clip 8 only** — the log then shows
-live `[SigNoz MCP] calling tool: signoz_query_metrics` lines between "Investigating"
-and "Diagnosis". Nothing else in the video changes.
+With Anthropic credits: set `COST_GUARD_MOCK=false`, restart Cost Guard,
+re-record **Act 4a only** — live `[SigNoz MCP] calling tool:` lines appear
+between "Investigating" and "Diagnosis". Nothing else changes.
 
 ## Troubleshooting
 
-- **Alert never reaches Cost Guard (local dev)** — webhook URL must be
-  `http://host.docker.internal:8082/alert`, never `localhost` (SigNoz is in Docker).
+- **Alert never reaches Cost Guard (local dev)** — webhook must be
+  `http://host.docker.internal:8082/alert`, never `localhost`.
 - **Alert never reaches Cost Guard (Docker Compose)** — use
-  `http://burnrate-cost-guard:8082/alert` (both on `signoz-network`).
-- **Dashboard lines flat at 0** — the baseline-traffic loop stopped; restart it.
-- **Port 8082 in use** — stale Cost Guard: `pkill -f "guard.webhook"`, restart.
-- **Mock vs real** — `COST_GUARD_MOCK=true` (default) needs no credits; the loop,
-  throttle, and report are all real. `false` + `ANTHROPIC_API_KEY` shows live MCP
-  tool calls.
+  `http://burnrate-cost-guard:8082/alert`.
+- **Dashboard flat at 0** — baseline-traffic loop stopped; restart it.
+- **Port 8082 busy** — `pkill -f "guard.webhook"`, restart.
+- **Mock vs real** — `COST_GUARD_MOCK=true` needs no credits; loop, throttle,
+  and report are all real either way.
