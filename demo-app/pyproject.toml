@@ -19,3 +19,6 @@ dependencies = [
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/demo"]
+
+[tool.uv.sources]
+burnrate-otel = { path = "../packages/burnrate-otel", editable = true }
