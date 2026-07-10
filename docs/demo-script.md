@@ -26,27 +26,31 @@ the system actually produces in mock mode.
 
 ---
 
-## Timeline
+## Timeline (updated to the actual generated VO — files in `docs/assets/vo/`)
 
 | # | Clip | Source | Duration | Ends at |
 |---|------|--------|---------:|--------:|
-| 0 | Cold open — the burn counter | Remotion `coldopen.mp4` (+ optional AI stills intercut) | 14s | 0:14 |
-| 1 | Title card | Remotion `intro.mp4` | 5s | 0:19 |
-| 2 | Card 01 — THE BLIND SPOT | Remotion `card01.mp4` | 1.2s | 0:20 |
-| 3 | Act 1: the spec gap | Screen + VO | 16s | 0:36 |
-| 4 | Card 02 — ONE LINE | Remotion `card02.mp4` | 1.2s | 0:37 |
-| 5 | Act 2: the fix | Screen + VO | 18s | 0:55 |
-| 6 | Card 03 — THE INCIDENT | Remotion `card03.mp4` | 1.2s | 0:56 |
-| 7 | Act 3: reenactment | Screen + VO | 22s | 1:18 |
-| 8 | Card 04 — THE MACHINE WAKES | Remotion `card04.mp4` | 1.2s | 1:19 |
-| 9 | Act 4a: Cost Guard log | Screen + VO | 24s | 1:43 |
-| 10 | Act 4b: the incident report | Screen + VO | 26s | 2:09 |
-| 11 | Card 05 — THE MORNING AFTER | Remotion `card05.mp4` | 1.2s | 2:10 |
-| 12 | Act 5: the evidence | Screen + VO | 22s | 2:32 |
-| 13 | Close: open source + upstream | Screen + VO | 16s | 2:48 |
-| 14 | Outro card | Remotion `outro.mp4` | 7s | 2:55 |
+| 0 | Cold open — the burn counter | `coldopen.mp4` + `coldIntro.mp3` | 20s | 0:20 |
+| 1 | Title card | `intro.mp4` | 5s | 0:25 |
+| 2 | Card 01 — THE BLIND SPOT | `card01.mp4` | 1.2s | 0:26 |
+| 3 | Act 1: the spec gap | Screen + `Blind Spot.mp3` | 20s | 0:46 |
+| 4 | Card 02 — ONE LINE | `card02.mp4` | 1.2s | 0:47 |
+| 5 | Act 2: the fix | Screen + `One Line.mp3` | 17s | 1:04 |
+| 6 | Card 03 — THE INCIDENT | `card03.mp4` | 1.2s | 1:06 |
+| 7 | Act 3: reenactment | Screen + `Incident.mp3` | 23s | 1:29 |
+| 8 | Card 04 — THE MACHINE WAKES | `card04.mp4` | 1.2s | 1:30 |
+| 9 | Act 4a: Cost Guard log | Screen + `Machine Wakes.mp3` | 25s | 1:55 |
+| 10 | Act 4b: the incident report | Screen + `The Report.mp3` | 28s | 2:23 |
+| 11 | Card 05 — THE MORNING AFTER | `card05.mp4` | 1.2s | 2:24 |
+| 12 | Act 5: the evidence | Screen + `The Morning After.mp3` | 27s | 2:51 |
+| 13 | Close: open source + upstream | Screen + `Close.mp3` | 21s | 3:12 |
+| 14 | Outro card | `outro.mp4` | 7s | 3:19 |
 
-Running long? Trim Act 5 to 16s, then drop cards 03–05.
+Screen-clip durations are set by the narration — trim each VO's trailing
+silence to ~0.7s in iMovie and cut the video to match. **Total: 3:19.** If the
+submission cap is a hard 3:00: drop cards 02–05 (−4.8s), tighten every act's
+tail to 0.3s (−5s), and trim Act 5's third shot (−4s) → ≈ 3:05; beyond that,
+cut the Act 1 spec-scroll hold.
 
 ---
 
