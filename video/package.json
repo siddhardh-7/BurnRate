@@ -1,0 +1,23 @@
+{
+  "name": "burnrate-video",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Remotion project — animated brand cards for the Burnrate demo video",
+  "scripts": {
+    "studio": "remotion studio",
+    "render": "npm run render:intro && npm run render:cards && npm run render:outro",
+    "render:intro": "remotion render Intro out/intro.mp4",
+    "render:cards": "remotion render Card01 out/card01.mp4 && remotion render Card02 out/card02.mp4 && remotion render Card03 out/card03.mp4 && remotion render Card04 out/card04.mp4 && remotion render Card05 out/card05.mp4",
+    "render:outro": "remotion render Outro out/outro.mp4"
+  },
+  "dependencies": {
+    "@remotion/cli": "^4.0.0",
+    "react": "^18.3.0",
+    "react-dom": "^18.3.0",
+    "remotion": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.0",
+    "typescript": "^5.5.0"
+  }
+}
