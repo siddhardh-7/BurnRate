@@ -23,7 +23,7 @@ export const ColdOpen: React.FC = () => {
     frame < 8 ? 0 : frame < 12 ? (frame % 2 === 0 ? 0.8 : 0.2) : 1;
 
   // The counter: slow creep, then compounding acceleration. $0.47 → $847.
-  const spend = interpolate(frame, [20, 360], [0.47, 847.23], {
+  const spend = interpolate(frame, [20, 540], [0.47, 847.23], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
     easing: Easing.in(Easing.cubic),
@@ -34,7 +34,7 @@ export const ColdOpen: React.FC = () => {
   });
 
   // Counter turns from off-white to orange as the burn accelerates.
-  const heat = interpolate(frame, [200, 340], [0, 1], {
+  const heat = interpolate(frame, [300, 510], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
@@ -43,7 +43,7 @@ export const ColdOpen: React.FC = () => {
 
   // Burn line: deterministic jagged climb across the lower third.
   const points: string[] = [];
-  const drawn = interpolate(frame, [30, 380], [0, 1], {
+  const drawn = interpolate(frame, [30, 560], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
     easing: Easing.in(Easing.quad),
@@ -64,7 +64,7 @@ export const ColdOpen: React.FC = () => {
   });
 
   // Final beat: cut to black in the last 10 frames.
-  const blackout = interpolate(frame, [408, 418], [0, 1], {
+  const blackout = interpolate(frame, [588, 598], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });

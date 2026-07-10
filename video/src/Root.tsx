@@ -15,7 +15,7 @@ export const Root: React.FC = () => (
     <Composition
       id="ColdOpen"
       component={ColdOpen}
-      durationInFrames={420}
+      durationInFrames={600}
       fps={FPS}
       width={W}
       height={H}
