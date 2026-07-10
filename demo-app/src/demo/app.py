@@ -27,12 +27,19 @@ from opentelemetry.sdk.trace.export import BatchSpanProcessor
 from opentelemetry.sdk.resources import SERVICE_NAME, Resource
 
 from burnrate import BurnrateSpanProcessor
+from . import fake_llm
 from .agents.researcher import ResearchAgent
 from .agents.summarizer import SummarizerAgent
 from .chaos import ChaosController
 
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger(__name__)
+
+if fake_llm.enabled():
+    log.warning(
+        "DEMO_FAKE_LLM active — LLM responses are synthesized (no Anthropic calls); "
+        "all telemetry downstream is real"
+    )
 
 # ── OTel setup ────────────────────────────────────────────────────────────────
 

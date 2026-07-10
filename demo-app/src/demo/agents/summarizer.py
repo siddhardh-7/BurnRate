@@ -7,6 +7,7 @@ import os
 from anthropic import Anthropic
 from opentelemetry import trace
 
+from .. import fake_llm
 from ..chaos import ChaosController
 
 tracer = trace.get_tracer(__name__)
@@ -15,7 +16,7 @@ _MODEL = os.getenv("SUMMARIZER_MODEL", "claude-haiku-4-5-20251001")
 
 class SummarizerAgent:
     def __init__(self, chaos: ChaosController | None = None) -> None:
-        self._client = Anthropic()
+        self._client = None if fake_llm.enabled() else Anthropic()
         self._chaos = chaos or ChaosController()
 
     async def run(self, research_text: str) -> str:
@@ -36,11 +37,20 @@ class SummarizerAgent:
                 "burnrate.feature": "research-pipeline",
             },
         ) as span:
-            resp = self._client.messages.create(
-                model=_MODEL,
-                max_tokens=256,
-                messages=[{"role": "user", "content": f"Summarize in one sentence:\n\n{prompt_text}"}],
-            )
+            messages = [{"role": "user", "content": f"Summarize in one sentence:\n\n{prompt_text}"}]
+            if fake_llm.enabled():
+                resp = fake_llm.complete(
+                    model=_MODEL,
+                    messages=messages,
+                    max_tokens=256,
+                    cache_hit=self._chaos.active_scenario != "cache_miss_storm",
+                )
+            else:
+                resp = self._client.messages.create(
+                    model=_MODEL,
+                    max_tokens=256,
+                    messages=messages,
+                )
             usage = resp.usage
             span.set_attribute("gen_ai.response.model", resp.model)
             span.set_attribute("gen_ai.usage.input_tokens", usage.input_tokens)

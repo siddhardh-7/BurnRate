@@ -109,6 +109,8 @@ The Cost Guard uses **SigNoz's official MCP server** — it doesn't call SigNoz 
 git clone https://github.com/siddhardh-7/BurnRate.git
 cd BurnRate
 cp .env.example .env        # fill in ANTHROPIC_API_KEY (or leave COST_GUARD_MOCK=true)
+# No Anthropic key? Add DEMO_FAKE_LLM=true — the demo synthesizes LLM responses
+# while the cost pipeline, alerts, and Cost Guard loop stay fully real.
 
 # Install SigNoz via Foundry (reads casting.yaml, starts SigNoz + MCP server)
 foundryctl cast

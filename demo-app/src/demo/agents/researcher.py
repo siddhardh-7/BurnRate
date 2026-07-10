@@ -9,6 +9,7 @@ import os
 from anthropic import Anthropic
 from opentelemetry import trace
 
+from .. import fake_llm
 from ..chaos import ChaosController
 
 log = logging.getLogger(__name__)
@@ -17,11 +18,12 @@ tracer = trace.get_tracer(__name__)
 _AGENT_ID = "researcher-v1"
 _DEFAULT_MODEL = os.getenv("RESEARCHER_MODEL", "claude-haiku-4-5-20251001")
 _EXPENSIVE_MODEL = "claude-sonnet-4-6"  # used when model_misroute chaos is active
+_SYSTEM = "You are a concise research assistant. Summarize key facts about the given topic in 3 bullet points."
 
 
 class ResearchAgent:
     def __init__(self, chaos: ChaosController | None = None) -> None:
-        self._client = Anthropic()
+        self._client = None if fake_llm.enabled() else Anthropic()
         self._chaos = chaos or ChaosController()
         self._context_history: list[dict] = []  # grows under prompt_bloat
 
@@ -81,12 +83,21 @@ class ResearchAgent:
                         continue
 
                     messages = self._build_messages(topic)
-                    resp = self._client.messages.create(
-                        model=model,
-                        max_tokens=512,
-                        messages=messages,
-                        system="You are a concise research assistant. Summarize key facts about the given topic in 3 bullet points.",
-                    )
+                    if fake_llm.enabled():
+                        resp = fake_llm.complete(
+                            model=model,
+                            messages=messages,
+                            system=_SYSTEM,
+                            max_tokens=512,
+                            cache_hit=self._chaos.active_scenario != "cache_miss_storm",
+                        )
+                    else:
+                        resp = self._client.messages.create(
+                            model=model,
+                            max_tokens=512,
+                            messages=messages,
+                            system=_SYSTEM,
+                        )
 
                     usage = resp.usage
                     llm_span.set_attribute("gen_ai.response.model", resp.model)

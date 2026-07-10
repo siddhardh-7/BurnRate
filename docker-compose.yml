@@ -21,6 +21,7 @@ services:
       OTLP_ENDPOINT: http://signoz-ingester:4317
       OTEL_SERVICE_NAME: demo-app
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-key_not_set}
+      DEMO_FAKE_LLM: ${DEMO_FAKE_LLM:-false}
       SIGNOZ_API_KEY: ${SIGNOZ_API_KEY:-}
     env_file: .env
     restart: unless-stopped
